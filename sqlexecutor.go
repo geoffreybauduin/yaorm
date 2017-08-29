@@ -1,26 +1,14 @@
 package yaorm
 
-import (
-	"github.com/Sirupsen/logrus"
-)
-
 type SqlExecutor struct {
 	DB
 }
 
 func (e *SqlExecutor) SelectOne(holder interface{}, query string, args ...interface{}) error {
-	logrus.WithFields(logrus.Fields{
-		"sql_query":  query,
-		"sql_params": args,
-	}).Infof("SQL Query")
 	return e.DB.SelectOne(holder, query, args...)
 }
 
 func (e *SqlExecutor) Select(i interface{}, query string, args ...interface{}) ([]interface{}, error) {
-	logrus.WithFields(logrus.Fields{
-		"sql_query":  query,
-		"sql_params": args,
-	}).Infof("SQL Query")
 	return e.DB.Select(i, query, args...)
 }
 
