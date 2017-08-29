@@ -1,0 +1,37 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "3dA3PsgYXZXzfsOOdDDvyp8zO0w=",
+			"path": "github.com/lann/builder",
+			"revision": "f22ce00fd9394014049dad11c244859432bd6820",
+			"revisionTime": "2015-08-08T15:11:31Z"
+		},
+		{
+			"checksumSHA1": "nR871nUQ6KxGoDR+TdgQhGUqcHI=",
+			"path": "github.com/lann/ps",
+			"revision": "62de8c46ede02a7675c4c79c84883eb164cb71e3",
+			"revisionTime": "2015-08-10T15:23:59Z"
+		},
+		{
+			"checksumSHA1": "ptNtbD3bhnuq0hHXK9PM4Jv8pAo=",
+			"path": "github.com/lann/squirrel",
+			"revision": "cb03830e33a9c086b3f9051548a81d299e190939",
+			"revisionTime": "2016-09-22T14:12:24Z"
+		},
+		{
+			"checksumSHA1": "iZ+0duzDAVej7NP5xrkB9jH70G8=",
+			"path": "github.com/loopfz/gadgeto/zesty",
+			"revision": "fae4881033fc4a3548c8cf1af798c8e885da1813",
+			"revisionTime": "2017-06-28T13:22:35Z"
+		},
+		{
+			"checksumSHA1": "WfBzXtIT3cs6Sm+9SL9TEANFM5M=",
+			"path": "github.com/loopfz/gadgeto/zesty/utils/rekordo",
+			"revision": "fae4881033fc4a3548c8cf1af798c8e885da1813",
+			"revisionTime": "2017-06-28T13:22:35Z"
+		}
+	],
+	"rootPath": "github.com/geoffreybauduin/yaorm"
+}
