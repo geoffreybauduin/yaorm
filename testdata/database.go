@@ -39,6 +39,7 @@ func setupSqlite(name string) (func(), error) {
 		DSN:              tmpFile,
 		System:           yaorm.DatabaseSqlite3,
 		AutoCreateTables: true,
+		ExecutorHook:     &LoggingExecutor{},
 	})
 	if err != nil {
 		return nil, err
@@ -58,6 +59,7 @@ func setupPostgres(name string) (func(), error) {
 		DSN:              os.Getenv("DSN"),
 		System:           yaorm.DatabasePostgreSQL,
 		AutoCreateTables: true,
+		ExecutorHook:     &LoggingExecutor{},
 	})
 	if err != nil {
 		return nil, err
@@ -88,6 +90,7 @@ func setupMysql(name string) (func(), error) {
 		System:           yaorm.DatabaseMySQL,
 		AutoCreateTables: true,
 		Dialect:          gorp.MySQLDialect{Engine: "InnoDB", Encoding: "UTF8"},
+		ExecutorHook:     &LoggingExecutor{},
 	})
 	if err != nil {
 		return nil, err

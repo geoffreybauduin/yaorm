@@ -2,10 +2,12 @@ package yaorm
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty/utils/rekordo"
+	"github.com/geoffreybauduin/yaorm/tools"
 	"github.com/go-gorp/gorp"
 	"github.com/juju/errors"
 )
@@ -15,15 +17,24 @@ var dblock sync.RWMutex
 type DB interface {
 	zesty.DB
 	System() DMS
+	ExecutorHook() ExecutorHook
 }
 
 type db struct {
 	zesty.DB
-	system DMS
+	system       DMS
+	executorHook ExecutorHook
 }
 
 func (d db) System() DMS {
 	return d.system
+}
+
+func (d db) ExecutorHook() ExecutorHook {
+	if d.executorHook == nil {
+		return &DefaultExecutorHook{}
+	}
+	return reflect.New(tools.GetNonPtrValue(d.executorHook).Type()).Interface().(ExecutorHook)
 }
 
 var (
@@ -41,6 +52,8 @@ type DatabaseConfiguration struct {
 	AutoCreateTables bool
 	// Dialect database dialect, leave empty for automatic guessing
 	Dialect gorp.Dialect
+	// ExecutorHook is a configurable hook to add logs, for example, to your sql requests
+	ExecutorHook ExecutorHook
 }
 
 // RegisterDB creates a new database with configuration
@@ -73,7 +86,11 @@ func RegisterDB(config *DatabaseConfiguration) error {
 		return err
 	}
 
-	registry[config.Name] = db{DB: dbHandler, system: config.System}
+	registry[config.Name] = db{
+		DB:           dbHandler,
+		system:       config.System,
+		executorHook: config.ExecutorHook,
+	}
 
 	return nil
 }
@@ -132,17 +149,4 @@ func (d DMS) RekordoValue() rekordo.DBMS {
 		return rekordo.DatabaseSqlite3
 	}
 	panic(fmt.Errorf("Invalid system"))
-}
-
-//TypeConverter defines convertion from db to golang
-type TypeConverter struct{}
-
-//ToDb converts to database
-func (tc TypeConverter) ToDb(val interface{}) (interface{}, error) {
-	return val, nil
-}
-
-//FromDb converts to golang
-func (tc TypeConverter) FromDb(target interface{}) (gorp.CustomScanner, bool) {
-	return gorp.CustomScanner{}, false
 }

@@ -5,11 +5,19 @@ type SqlExecutor struct {
 }
 
 func (e *SqlExecutor) SelectOne(holder interface{}, query string, args ...interface{}) error {
-	return e.DB.SelectOne(holder, query, args...)
+	hook := e.ExecutorHook()
+	hook.BeforeSelectOne(query, args...)
+	err := e.DB.SelectOne(holder, query, args...)
+	hook.AfterSelectOne(query, args...)
+	return err
 }
 
 func (e *SqlExecutor) Select(i interface{}, query string, args ...interface{}) ([]interface{}, error) {
-	return e.DB.Select(i, query, args...)
+	hook := e.ExecutorHook()
+	hook.BeforeSelect(query, args...)
+	v, err := e.DB.Select(i, query, args...)
+	hook.AfterSelect(query, args...)
+	return v, err
 }
 
 /*
