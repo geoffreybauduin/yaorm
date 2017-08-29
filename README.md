@@ -4,6 +4,28 @@
 
 This is another ORM. Another one.
 
+- [Concept](#)
+	- [Must-do](#)
+- [Models by examples](#)
+	- [Declaration](#)
+	- [Loading a model](#)
+		- [Using a generic function](#)
+		- [Using the model's load function](#)
+	- [Saving a model](#)
+		- [Using a generic function](#)
+		- [Using the model's save function](#)
+	- [Joining](#)
+	- [And more...](#)
+- [The theory](#)
+	- [Filtering on any model](#)
+	- [Automatic loading](#)
+- [Hooks](#)
+	- [SQL Executor](#)
+- [Good practices](#)
+	- [Filters](#)
+- [Contributing](#)
+- [License](#)
+
 # Concept
 
 - Declare a bit more of code to handle all your models the same way
@@ -212,7 +234,7 @@ func CreateCategory(dbp yaorm.DBProvider, name string) (*Category, error) {
 }
 ```
 
-# Joining
+## Joining
 
 ```golang
 package main
@@ -402,6 +424,52 @@ func GetPostsFromCategory(dbp yaorm.DBProvider, category *Category) {
         NewCategoryFilter().Name(category.Name).Subqueryload(),
     )
     // and then posts[0].Category won't be nil
+}
+```
+
+# Hooks
+
+## SQL Executor
+
+It is possible to define custom hooks while executing SQL requests. Possible hooks are currently:
+
+- Before/After `SelectOne`
+- Before/After `Select` (multiple)
+
+Your executor should implement `yaorm.ExecutorHook` interface, and can compose `yaorm.DefaultExecutorHook` to avoid any issues with updates (like a missing method to implement).
+The executor hook can be declared while registering the database
+
+
+
+```golang
+package main
+
+import (
+    "log"
+    "github.com/geoffreybauduin/yaorm"
+)
+
+type LoggingExecutor struct {
+    *yaorm.DefaultExecutorHook
+}
+
+func (h LoggingExecutor) AfterSelectOne(query string, args ...interface{})  {
+    log.Printf("SQL Query: %s %+v\n", query, args)
+}
+
+func main() {
+    defer func() {
+        os.Remove("/tmp/test_test.sqlite")
+        yaorm.UnregisterDB("test")
+    }()
+    yaorm.RegisterDB(&yaorm.DatabaseConfiguration{
+        Name:             "test",
+        DSN:              "/tmp/test_test.sqlite",
+        System:           yaorm.DatabaseSqlite3,
+        AutoCreateTables: true,
+        ExecutorHook:     &LoggingExecutor{},
+    })
+    // now it will use the executor
 }
 ```
 

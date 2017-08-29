@@ -34,7 +34,7 @@ func NewDBProvider(name string) (DBProvider, error) {
 // DB returns a SQL Executor interface
 func (dbp *dbprovider) DB() gorp.SqlExecutor {
 	db := registry[dbp.name]
-	return &SqlExecutor{db}
+	return &SqlExecutor{DB: db}
 }
 
 // EscapeValue escapes the value sent according to the dialect
