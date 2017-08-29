@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/go-gorp/gorp"
-	"github.com/juju/errors"
-
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty/utils/rekordo"
+	"github.com/go-gorp/gorp"
+	"github.com/juju/errors"
 )
 
 var dblock sync.RWMutex

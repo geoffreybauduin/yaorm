@@ -8,4 +8,9 @@ go:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install sqlite
+install:
+  - go get github.com/go-gorp/gorp
+  - go get github.com/juju/errors
+  - go get github.com/stretchr/testify/assert
+  - go get github.com/mattn/go-sqlite3
 script: make test

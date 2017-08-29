@@ -1,12 +1,11 @@
 package tools_test
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"reflect"
 	"github.com/geoffreybauduin/yaorm/tools"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNonPtrValue(t *testing.T) {

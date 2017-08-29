@@ -4,9 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/geoffreybauduin/yaorm/yaormfilter"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEquals(t *testing.T) {

@@ -6,10 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/juju/errors"
-
 	"github.com/geoffreybauduin/yaorm/tools"
 	"github.com/geoffreybauduin/yaorm/yaormfilter"
+	"github.com/juju/errors"
 )
 
 // Model is the interface every model should implement from

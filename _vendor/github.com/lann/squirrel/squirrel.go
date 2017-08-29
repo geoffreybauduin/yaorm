@@ -7,7 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/lann/builder"
+	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/builder"
 )
 
 // Sqlizer is the interface that wraps the ToSql method.

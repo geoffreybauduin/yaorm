@@ -7,11 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/juju/errors"
-
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty/utils/rekordo"
 	"github.com/geoffreybauduin/yaorm/tools"
 	"github.com/geoffreybauduin/yaorm/yaormfilter"
+	"github.com/juju/errors"
 )
 
 var (

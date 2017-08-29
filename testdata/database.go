@@ -6,9 +6,8 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
-
 	"github.com/geoffreybauduin/yaorm"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func init() {

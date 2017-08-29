@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lann/builder"
+	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/builder"
 )
 
 type selectData struct {

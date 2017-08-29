@@ -3,12 +3,11 @@ package yaorm_test
 import (
 	"testing"
 
-	"github.com/juju/errors"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/geoffreybauduin/yaorm"
 	"github.com/geoffreybauduin/yaorm/testdata"
 	"github.com/geoffreybauduin/yaorm/yaormfilter"
+	"github.com/juju/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGenericSelectOne_NotFound(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/lann/builder"
+	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/builder"
 )
 
 type updateData struct {

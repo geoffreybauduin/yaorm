@@ -1,9 +1,8 @@
 package yaorm
 
 import (
-	"github.com/go-gorp/gorp"
-
 	"github.com/geoffreybauduin/yaorm/tools"
+	"github.com/go-gorp/gorp"
 )
 
 func isPGSQL(dbp DBProvider) bool {

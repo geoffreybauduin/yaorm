@@ -3,9 +3,8 @@ package yaormfilter_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/geoffreybauduin/yaorm/yaormfilter"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewNilFilter(t *testing.T) {

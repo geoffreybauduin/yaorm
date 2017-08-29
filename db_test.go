@@ -4,10 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/geoffreybauduin/yaorm"
 	_ "github.com/geoffreybauduin/yaorm/testdata"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterDB(t *testing.T) {

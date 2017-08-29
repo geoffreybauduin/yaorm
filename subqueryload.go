@@ -3,6 +3,7 @@ package yaorm
 import (
 	"fmt"
 	"reflect"
+
 	"github.com/geoffreybauduin/yaorm/tools"
 )
 
