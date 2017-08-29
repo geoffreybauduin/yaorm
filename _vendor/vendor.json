@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "ptNtbD3bhnuq0hHXK9PM4Jv8pAo=",
+			"path": "github.com/lann/squirrel",
+			"revision": "cb03830e33a9c086b3f9051548a81d299e190939",
+			"revisionTime": "2016-09-22T14:12:24Z"
+		},
+		{
+			"checksumSHA1": "iZ+0duzDAVej7NP5xrkB9jH70G8=",
+			"path": "github.com/loopfz/gadgeto/zesty",
+			"revision": "fae4881033fc4a3548c8cf1af798c8e885da1813",
+			"revisionTime": "2017-06-28T13:22:35Z"
+		},
+		{
+			"checksumSHA1": "WfBzXtIT3cs6Sm+9SL9TEANFM5M=",
+			"path": "github.com/loopfz/gadgeto/zesty/utils/rekordo",
+			"revision": "fae4881033fc4a3548c8cf1af798c8e885da1813",
+			"revisionTime": "2017-06-28T13:22:35Z"
+		}
+	],
+	"rootPath": "github.com/geoffreybauduin/yaorm"
+}
