@@ -1,19 +1,20 @@
 package yaorm
 
 import (
+	"fmt"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 )
 
-var (
-	generator = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-)
-
-func buildSelect(m Model) (squirrel.SelectBuilder, error) {
+func buildSelect(dbp DBProvider, m Model) (squirrel.SelectBuilder, error) {
 	table, err := GetTableByModel(m)
 	if err != nil {
 		return squirrel.SelectBuilder{}, err
 	}
-	fields := table.FieldsForQuery(table.Name())
+	fields := table.Fields()
+	f := []string{}
+	for _, field := range fields {
+		f = append(f, fmt.Sprintf(`%s.%s`, dbp.EscapeValue(table.Name()), dbp.EscapeValue(field)))
+	}
 
-	return generator.Select(fields...).From(table.NameForQuery()), nil
+	return dbp.getStatementGenerator().Select(f...).From(dbp.EscapeValue(table.Name())), nil
 }

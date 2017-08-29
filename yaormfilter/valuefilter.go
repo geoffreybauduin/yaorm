@@ -58,7 +58,7 @@ func (f *valuefilterimpl) in(e []interface{}) *valuefilterimpl {
 }
 
 func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fieldName string) squirrel.SelectBuilder {
-	computedField := fmt.Sprintf(`"%s"."%s"`, tableName, fieldName)
+	computedField := fmt.Sprintf(`%s.%s`, tableName, fieldName)
 	if f.nil_ != nil {
 		if *f.nil_ == true {
 			statement = statement.Where(

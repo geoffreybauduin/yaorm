@@ -24,27 +24,10 @@ func TestTable_Fields(t *testing.T) {
 	assert.Equal(t, table.Fields()[3], "updated_at")
 }
 
-func TestTable_FieldsForQuery(t *testing.T) {
-	table := yaorm.NewTable("test", "category", &testdata.Category{})
-	assert.NotNil(t, table)
-	fields := table.FieldsForQuery("category")
-	assert.Len(t, fields, 4)
-	assert.Equal(t, fields[0], `"category"."id"`)
-	assert.Equal(t, fields[1], `"category"."name"`)
-	assert.Equal(t, fields[2], `"category"."created_at"`)
-	assert.Equal(t, fields[3], `"category"."updated_at"`)
-}
-
 func TestTable_Name(t *testing.T) {
 	table := yaorm.NewTable("test", "category", &testdata.Category{})
 	assert.NotNil(t, table)
 	assert.Equal(t, "category", table.Name())
-}
-
-func TestTable_NameForQuery(t *testing.T) {
-	table := yaorm.NewTable("test", "category", &testdata.Category{})
-	assert.NotNil(t, table)
-	assert.Equal(t, `"category"`, table.NameForQuery())
 }
 
 func TestTable_NewModel(t *testing.T) {

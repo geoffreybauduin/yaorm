@@ -14,6 +14,7 @@ type filterApplier struct {
 	statement squirrel.SelectBuilder
 	filter    yaormfilter.Filter
 	tableName string
+	dbp       DBProvider
 }
 
 type filterFieldApplier struct {
@@ -24,6 +25,7 @@ type filterFieldApplier struct {
 	dbFieldName string
 	isJoining   bool
 	leftJoin    bool
+	dbp         DBProvider
 }
 
 func getTableNameFromFilter(f yaormfilter.Filter) string {
@@ -39,14 +41,15 @@ func apply(statement squirrel.SelectBuilder, f yaormfilter.Filter, dbp DBProvide
 		statement: statement,
 		filter:    f,
 		tableName: getTableNameFromFilter(f),
+		dbp:       dbp,
 	}
 	applier.Apply()
 	statement = applier.statement
 	for _, option := range f.GetSelectOptions() {
 		switch option {
 		case yaormfilter.RequestOptions.SelectForUpdate:
-			if isPGSQL(dbp) {
-				statement = statement.Suffix(fmt.Sprintf(`FOR UPDATE OF "%s"`, applier.tableName))
+			if dbp.CanSelectForUpdate() {
+				statement = statement.Suffix(fmt.Sprintf(`FOR UPDATE OF %s`, dbp.EscapeValue(applier.tableName)))
 			}
 		}
 	}
@@ -70,6 +73,7 @@ func (a *filterApplier) Apply() {
 			tagData:   tagData,
 			statement: a.statement,
 			tableName: a.tableName,
+			dbp:       a.dbp,
 		}
 		applier.Apply()
 		a.statement = applier.statement
@@ -112,7 +116,7 @@ func (a *filterFieldApplier) setupFromTag() {
 func (a *filterFieldApplier) applyPtr() {
 	valueFilter, ok := a.field.Interface().(yaormfilter.ValueFilter)
 	if ok {
-		a.statement = valueFilter.Apply(a.statement, a.tableName, a.dbFieldName)
+		a.statement = valueFilter.Apply(a.statement, a.dbp.EscapeValue(a.tableName), a.dbp.EscapeValue(a.dbFieldName))
 	} else {
 		structFilter, ok := a.field.Interface().(yaormfilter.Filter)
 		if ok {
@@ -153,13 +157,22 @@ func (a *filterFieldApplier) applyFilter(f yaormfilter.Filter, tableName string)
 		statement: a.statement,
 		tableName: tableName,
 		filter:    f,
+		dbp:       a.dbp,
 	}
 	filterApplier.Apply()
 	a.statement = filterApplier.statement
 }
 
 func (a *filterFieldApplier) join(f yaormfilter.Filter, tableAlias string) {
-	joinCondition := fmt.Sprintf(`"%s" as %s on "%s"."%s" = "%s"."%s"`, getTableNameFromFilter(f), tableAlias, tableAlias, a.tagData[2], a.tableName, a.tagData[3])
+	joinCondition := fmt.Sprintf(
+		`%s as %s on %s.%s = %s.%s`,
+		a.dbp.EscapeValue(getTableNameFromFilter(f)),
+		a.dbp.EscapeValue(tableAlias),
+		a.dbp.EscapeValue(tableAlias),
+		a.dbp.EscapeValue(a.tagData[2]),
+		a.dbp.EscapeValue(a.tableName),
+		a.dbp.EscapeValue(a.tagData[3]),
+	)
 	if !a.leftJoin {
 		a.statement = a.statement.Join(joinCondition)
 	} else {

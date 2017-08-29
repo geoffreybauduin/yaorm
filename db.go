@@ -14,10 +14,16 @@ var dblock sync.RWMutex
 
 type DB interface {
 	zesty.DB
+	System() DMS
 }
 
 type db struct {
 	zesty.DB
+	system DMS
+}
+
+func (d db) System() DMS {
+	return d.system
 }
 
 var (
@@ -62,12 +68,12 @@ func RegisterDB(config *DatabaseConfiguration) error {
 	}
 
 	// Get database handler
-	db, err := zesty.GetDB(config.Name)
+	dbHandler, err := zesty.GetDB(config.Name)
 	if err != nil {
 		return err
 	}
 
-	registry[config.Name] = db
+	registry[config.Name] = db{DB: dbHandler, system: config.System}
 
 	return nil
 }

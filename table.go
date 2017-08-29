@@ -173,18 +173,6 @@ func (t Table) Fields() []string {
 	return t.fields
 }
 
-func (t Table) FieldsForQuery(tableName string) []string {
-	fields := []string{}
-	for _, field := range t.fields {
-		fields = append(fields, fmt.Sprintf(`"%s"."%s"`, tableName, field))
-	}
-	return fields
-}
-
-func (t Table) NameForQuery() string {
-	return fmt.Sprintf(`"%s"`, t.Name())
-}
-
 func (t Table) Name() string {
 	return t.name
 }
