@@ -27,7 +27,7 @@ type DatabaseConfig struct {
 
 // RegisterDatabase creates a gorp map with tables and tc and
 // registers it with zesty.
-func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter) error {
+func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter, dialect gorp.Dialect) error {
 	dbConn, err := sql.Open(db.System.DriverName(), db.DSN)
 	if err != nil {
 		return err
@@ -45,16 +45,17 @@ func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter) error {
 	dbConn.SetMaxIdleConns(db.MaxIdleConns)
 
 	// Select the proper dialect used by gorp.
-	var dialect gorp.Dialect
-	switch db.System {
-	case DatabaseMySQL:
-		dialect = gorp.MySQLDialect{}
-	case DatabasePostgreSQL:
-		dialect = gorp.PostgresDialect{}
-	case DatabaseSqlite3:
-		dialect = gorp.SqliteDialect{}
-	default:
-		return errors.New("unknown database system")
+	if dialect == nil {
+		switch db.System {
+		case DatabaseMySQL:
+			dialect = gorp.MySQLDialect{}
+		case DatabasePostgreSQL:
+			dialect = gorp.PostgresDialect{}
+		case DatabaseSqlite3:
+			dialect = gorp.SqliteDialect{}
+		default:
+			return errors.New("unknown database system")
+		}
 	}
 	dbmap := &gorp.DbMap{
 		Db:            dbConn,

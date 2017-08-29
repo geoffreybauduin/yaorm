@@ -1,5 +1,7 @@
 # Yet Another ORM
 
+[![Build Status](https://travis-ci.org/geoffreybauduin/yaorm.svg?branch=master)](https://travis-ci.org/geoffreybauduin/yaorm)
+
 This is another ORM. Another one.
 
 # Concept

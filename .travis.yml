@@ -3,6 +3,9 @@ go:
   - 1.7.x
   - 1.8.x
   - 1.9.x
+services:
+  - mysql
+  - postgres
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install sqlite
@@ -11,4 +14,13 @@ install:
   - go get github.com/juju/errors
   - go get github.com/stretchr/testify/assert
   - go get github.com/mattn/go-sqlite3
+  - go get github.com/lib/pq
+  - go get github.com/go-sql-driver/mysql
+env:
+  - DB=sqlite
+  - DB=mysql DSN=travis:@/test
+  - DB=postgres DSN=postgres://postgres:@/test
+before_script:
+  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE test;' -U postgres; psql -c 'CREATE DATABASE test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'DROP DATABASE test;' ; mysql -e 'CREATE DATABASE test;'; mysql -e \"GRANT ALL PRIVILEGES ON test.* TO 'travis'@'%';\"; fi"
 script: make test

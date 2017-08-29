@@ -33,6 +33,8 @@ type DatabaseConfiguration struct {
 	MaxOpenConns     int
 	MaxIdleConns     int
 	AutoCreateTables bool
+	// Dialect database dialect, leave empty for automatic guessing
+	Dialect gorp.Dialect
 }
 
 // RegisterDB creates a new database with configuration
@@ -54,7 +56,7 @@ func RegisterDB(config *DatabaseConfiguration) error {
 	}
 
 	// Register database.
-	err := rekordo.RegisterDatabase(databaseConfiguration, TypeConverter{})
+	err := rekordo.RegisterDatabase(databaseConfiguration, TypeConverter{}, config.Dialect)
 	if err != nil {
 		return err
 	}
