@@ -154,7 +154,6 @@ func GenericSelectAll(dbp DBProvider, filter yaormfilter.Filter) ([]Model, error
 	}
 	_, err = dbp.DB().Select(sm, query, params...)
 	if err != nil {
-		panic(err)
 		if err == sql.ErrNoRows {
 			return nil, errors.NotFoundf(formatTablenameFromError(m))
 		}

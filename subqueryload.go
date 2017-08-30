@@ -42,7 +42,7 @@ func subqueryloadForModel(dbp DBProvider, model string, data map[interface{}][]r
 		return d, fmt.Errorf("Subqueryload model %s not defined yet", model)
 	}
 	ids := []interface{}{}
-	for id, _ := range data {
+	for id := range data {
 		ids = append(ids, id)
 	}
 	for factor := 0; factor*loadStep < len(ids); factor++ {
