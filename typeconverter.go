@@ -2,7 +2,7 @@ package yaorm
 
 import "github.com/go-gorp/gorp"
 
-//TypeConverter defines convertion from db to golang
+//TypeConverter defines conversion from db to golang
 type TypeConverter struct{}
 
 //ToDb converts to database
