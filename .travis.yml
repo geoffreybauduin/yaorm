@@ -16,6 +16,9 @@ install:
   - go get github.com/mattn/go-sqlite3
   - go get github.com/lib/pq
   - go get github.com/go-sql-driver/mysql
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go install github.com/mattn/goveralls
 env:
   - DB=sqlite
   - DB=mysql DSN="travis:@/test?parseTime=true"
@@ -23,4 +26,4 @@ env:
 before_script:
   - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE test;' -U postgres; psql -c 'CREATE DATABASE test;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'DROP DATABASE test;' ; mysql -e 'CREATE DATABASE test;'; mysql -e \"GRANT ALL PRIVILEGES ON test.* TO 'travis'@'%';\"; fi"
-script: make test
+script: make testwithcoverage

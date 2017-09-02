@@ -5,3 +5,6 @@ test:
 
 vendor:
 	mv _vendor vendor ; govendor add $(filter-out $@,$(MAKECMDGOALS)) ; mv vendor _vendor
+
+testwithcoverage:
+	ROOT_DIR=$(ROOT_DIR) ./test-coverage.sh $(filter-out $@,$(MAKECMDGOALS))
