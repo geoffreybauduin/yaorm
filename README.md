@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/geoffreybauduin/yaorm.svg?branch=master)](https://travis-ci.org/geoffreybauduin/yaorm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/geoffreybauduin/yaorm)](https://goreportcard.com/report/github.com/geoffreybauduin/yaorm)
+[![Coverage Status](https://coveralls.io/repos/github/geoffreybauduin/yaorm/badge.svg?branch=master)](https://coveralls.io/github/geoffreybauduin/yaorm?branch=master)
 
 This is another ORM. Another one.
 
