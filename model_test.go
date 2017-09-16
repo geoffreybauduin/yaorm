@@ -290,3 +290,22 @@ func TestDatabaseModel_Load(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, category.Name, foundCategory.Name)
 }
+
+func TestGenericSelectOne_WithSelectForUpdate(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider("test")
+	assert.Nil(t, err)
+	m := &testdata.Category{Name: "category"}
+	m.SetDBP(dbp)
+	err = yaorm.GenericSave(m)
+	assert.Nil(t, err)
+	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewCategoryFilter().Name(
+		yaormfilter.Equals("category"),
+	).AddOption(
+		yaormfilter.RequestOptions.SelectForUpdate,
+	))
+	assert.Nil(t, err)
+	assert.Equal(t, m.ID, modelFound.(*testdata.Category).ID)
+}

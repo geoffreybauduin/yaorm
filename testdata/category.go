@@ -67,3 +67,8 @@ func (f *CategoryFilter) Subqueryload() yaormfilter.Filter {
 	f.AllowSubqueryload()
 	return f
 }
+
+func (f *CategoryFilter) AddOption(opt yaormfilter.RequestOption) yaormfilter.Filter {
+	f.AddOption_(opt)
+	return f
+}

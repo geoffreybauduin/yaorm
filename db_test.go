@@ -7,6 +7,7 @@ import (
 	"github.com/geoffreybauduin/yaorm"
 	_ "github.com/geoffreybauduin/yaorm/testdata"
 	"github.com/stretchr/testify/assert"
+	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty/utils/rekordo"
 )
 
 func TestRegisterDB(t *testing.T) {
@@ -128,4 +129,26 @@ func TestDb_ExecutorHook_Custom(t *testing.T) {
 	inst := dbp.DB().(yaorm.DB).ExecutorHook()
 	assert.NotNil(t, inst)
 	assert.IsType(t, inst, &customExecutorHook{})
+}
+
+func TestDMS_DriverName(t *testing.T) {
+	systemExpect := map[yaorm.DMS]string{
+		yaorm.DatabaseSqlite3: "sqlite3",
+		yaorm.DatabaseMySQL: "mysql",
+		yaorm.DatabasePostgreSQL: "postgres",
+	}
+	for dms, expected := range systemExpect {
+		assert.Equal(t, expected, dms.DriverName())
+	}
+}
+
+func TestDMS_RekordoValue(t *testing.T) {
+	systemExpect := map[yaorm.DMS]rekordo.DBMS{
+		yaorm.DatabaseSqlite3: rekordo.DatabaseSqlite3,
+		yaorm.DatabaseMySQL: rekordo.DatabaseMySQL,
+		yaorm.DatabasePostgreSQL: rekordo.DatabasePostgreSQL,
+	}
+	for dms, expected := range systemExpect {
+		assert.Equal(t, expected, dms.RekordoValue())
+	}
 }

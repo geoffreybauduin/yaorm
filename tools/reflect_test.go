@@ -35,4 +35,6 @@ func TestIsZeroValue(t *testing.T) {
 	assert.False(t, tools.IsZeroValue(reflect.ValueOf(1)))
 	assert.False(t, tools.IsZeroValue(reflect.ValueOf([]int{1})))
 	assert.False(t, tools.IsZeroValue(reflect.ValueOf(struct{ Test string }{"test"})))
+	assert.True(t, tools.IsZeroValue(reflect.ValueOf([0]int{})))
+	assert.True(t, tools.IsZeroValue(reflect.ValueOf([1]int{0})))
 }
