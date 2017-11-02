@@ -53,6 +53,11 @@ func apply(statement squirrel.SelectBuilder, f yaormfilter.Filter, dbp DBProvide
 			}
 		}
 	}
+	for _, orderBy := range f.GetOrderBy() {
+		statement = statement.OrderBy(
+			fmt.Sprintf("%s.%s %s", dbp.EscapeValue(applier.tableName), dbp.EscapeValue(orderBy.Field), orderBy.Way),
+		)
+	}
 	return statement
 }
 

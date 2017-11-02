@@ -67,3 +67,8 @@ func (f *CategoryFilter) Subqueryload() yaormfilter.Filter {
 	f.AllowSubqueryload()
 	return f
 }
+
+func (f *CategoryFilter) OrderBy(field string, way yaormfilter.OrderingWay) yaormfilter.Filter {
+	f.SetOrderBy(field, way)
+	return f
+}
