@@ -16,14 +16,18 @@ func NewInt64Filter() ValueFilter {
 	return &Int64Filter{}
 }
 
-// Equals adds an equal filter
-func (f *Int64Filter) Equals(v interface{}) ValueFilter {
+func (f *Int64Filter) getValue(v interface{}) interface{} {
 	underlyingValue := tools.GetNonPtrValue(v)
 	// make sure we have an int64
 	if underlyingValue.Kind() != reflect.Int64 {
 		panic("Value in Int64Filter is not an int64")
 	}
-	f.equals(underlyingValue.Interface())
+	return underlyingValue.Interface()
+}
+
+// Equals adds an equal filter
+func (f *Int64Filter) Equals(v interface{}) ValueFilter {
+	f.equals(f.getValue(v))
 	return f
 }
 
@@ -42,13 +46,32 @@ func (f *Int64Filter) Nil(v bool) ValueFilter {
 func (f *Int64Filter) In(values ...interface{}) ValueFilter {
 	interfaceValues := []interface{}{}
 	for _, v := range values {
-		underlyingValue := tools.GetNonPtrValue(v)
-		// make sure we have an int64
-		if underlyingValue.Kind() != reflect.Int64 {
-			panic("Value in Int64Filter is not an int64")
-		}
-		interfaceValues = append(interfaceValues, underlyingValue.Interface())
+		interfaceValues = append(interfaceValues, f.getValue(v))
 	}
 	f.in(interfaceValues)
+	return f
+}
+
+// Lt adds a < filter
+func (f *Int64Filter) Lt(v interface{}) ValueFilter {
+	f.lt(f.getValue(v))
+	return f
+}
+
+// Lte adds a <= filter
+func (f *Int64Filter) Lte(v interface{}) ValueFilter {
+	f.lte(f.getValue(v))
+	return f
+}
+
+// Gt adds a > filter
+func (f *Int64Filter) Gt(v interface{}) ValueFilter {
+	f.gt(f.getValue(v))
+	return f
+}
+
+// Gte adds a > filter
+func (f *Int64Filter) Gte(v interface{}) ValueFilter {
+	f.gte(f.getValue(v))
 	return f
 }

@@ -72,3 +72,59 @@ func Like(v interface{}) ValueFilter {
 	}
 	panic(fmt.Errorf("Unknown type: %+v for value %+v in Like filter", underlyingValue.Kind(), v))
 }
+
+// Lt returns the correct filter according the value sent
+func Lt(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().Lt(v)
+	case reflect.Struct:
+		if _, ok := underlyingValue.Interface().(time.Time); ok {
+			return NewDateFilter().Lt(v)
+		}
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in Lt filter", underlyingValue.Kind(), v))
+}
+
+// Lte returns the correct filter according the value sent
+func Lte(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().Lte(v)
+	case reflect.Struct:
+		if _, ok := underlyingValue.Interface().(time.Time); ok {
+			return NewDateFilter().Lte(v)
+		}
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in Lte filter", underlyingValue.Kind(), v))
+}
+
+// Gt returns the correct filter according the value sent
+func Gt(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().Gt(v)
+	case reflect.Struct:
+		if _, ok := underlyingValue.Interface().(time.Time); ok {
+			return NewDateFilter().Gt(v)
+		}
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in Gt filter", underlyingValue.Kind(), v))
+}
+
+// Gte returns the correct filter according the value sent
+func Gte(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().Gte(v)
+	case reflect.Struct:
+		if _, ok := underlyingValue.Interface().(time.Time); ok {
+			return NewDateFilter().Gte(v)
+		}
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in Gte filter", underlyingValue.Kind(), v))
+}

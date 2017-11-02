@@ -25,3 +25,23 @@ func TestIn(t *testing.T) {
 func TestLike(t *testing.T) {
 	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.Like("abcdef%"))
 }
+
+func TestLt(t *testing.T) {
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.Lt(int64(12)))
+	assert.IsType(t, &yaormfilter.DateFilter{}, yaormfilter.Lt(time.Now()))
+}
+
+func TestLte(t *testing.T) {
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.Lte(int64(12)))
+	assert.IsType(t, &yaormfilter.DateFilter{}, yaormfilter.Lte(time.Now()))
+}
+
+func TestGt(t *testing.T) {
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.Gt(int64(12)))
+	assert.IsType(t, &yaormfilter.DateFilter{}, yaormfilter.Gt(time.Now()))
+}
+
+func TestGte(t *testing.T) {
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.Gte(int64(12)))
+	assert.IsType(t, &yaormfilter.DateFilter{}, yaormfilter.Gte(time.Now()))
+}

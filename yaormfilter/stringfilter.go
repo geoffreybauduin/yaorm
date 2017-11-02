@@ -57,3 +57,23 @@ func (f *StringFilter) In(values ...interface{}) ValueFilter {
 	f.in(interfaceValues)
 	return f
 }
+
+// Lt adds a < filter
+func (f *StringFilter) Lt(v interface{}) ValueFilter {
+	return f
+}
+
+// Lte adds a <= filter
+func (f *StringFilter) Lte(v interface{}) ValueFilter {
+	return f
+}
+
+// Gt adds a > filter
+func (f *StringFilter) Gt(v interface{}) ValueFilter {
+	return f
+}
+
+// Gte adds a > filter
+func (f *StringFilter) Gte(v interface{}) ValueFilter {
+	return f
+}

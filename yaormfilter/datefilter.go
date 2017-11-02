@@ -21,14 +21,18 @@ func NewDateFilter() ValueFilter {
 	return &DateFilter{}
 }
 
-// Equals applies an equal filter on Date
-func (f *DateFilter) Equals(v interface{}) ValueFilter {
+func (f *DateFilter) getValue(v interface{}) interface{} {
 	underlyingValue := tools.GetNonPtrValue(v)
-	// make sure we have an int64
+	// make sure we have a time.Time
 	if underlyingValue.Kind() != reflect.Struct || underlyingValue.Type() != timeType {
 		panic("Value in DateFilter is not a time.Time object")
 	}
-	f.equals(underlyingValue.Interface())
+	return underlyingValue.Interface()
+}
+
+// Equals applies an equal filter on Date
+func (f *DateFilter) Equals(v interface{}) ValueFilter {
+	f.equals(f.getValue(v))
 	return f
 }
 
@@ -46,5 +50,29 @@ func (f *DateFilter) Nil(v bool) ValueFilter {
 
 // In adds a IN filter (not implemented)
 func (f *DateFilter) In(values ...interface{}) ValueFilter {
+	return f
+}
+
+// Lt adds a < filter
+func (f *DateFilter) Lt(v interface{}) ValueFilter {
+	f.lt(f.getValue(v))
+	return f
+}
+
+// Lte adds a <= filter
+func (f *DateFilter) Lte(v interface{}) ValueFilter {
+	f.lte(f.getValue(v))
+	return f
+}
+
+// Gt adds a > filter
+func (f *DateFilter) Gt(v interface{}) ValueFilter {
+	f.gt(f.getValue(v))
+	return f
+}
+
+// Gte adds a > filter
+func (f *DateFilter) Gte(v interface{}) ValueFilter {
+	f.gte(f.getValue(v))
 	return f
 }
