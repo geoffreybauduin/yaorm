@@ -98,3 +98,4 @@ func TestFilterApplier_ApplyWithOrderBy(t *testing.T) {
 	assert.Equal(t, models[0].(*testdata.Category).ID, category.ID)
 	assert.Equal(t, models[1].(*testdata.Category).ID, category2.ID)
 }
+
