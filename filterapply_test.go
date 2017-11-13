@@ -74,3 +74,28 @@ func TestFilterApplier_ApplyGte(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, models, 2)
 }
+
+func TestFilterApplier_ApplyWithOrderBy(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider("test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category2"}
+	saveModel(t, dbp, category2)
+
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().OrderBy("id", yaormfilter.OrderingWays.Desc))
+	assert.Nil(t, err)
+	assert.Len(t, models, 2)
+	assert.Equal(t, models[0].(*testdata.Category).ID, category2.ID)
+	assert.Equal(t, models[1].(*testdata.Category).ID, category.ID)
+
+	models, err = yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().OrderBy("id", yaormfilter.OrderingWays.Asc))
+	assert.Nil(t, err)
+	assert.Len(t, models, 2)
+	assert.Equal(t, models[0].(*testdata.Category).ID, category.ID)
+	assert.Equal(t, models[1].(*testdata.Category).ID, category2.ID)
+}
+
