@@ -31,3 +31,23 @@ func (f *NilFilter) Nil(v bool) ValueFilter {
 func (f *NilFilter) In(values ...interface{}) ValueFilter {
 	return f
 }
+
+// Lt adds a < filter
+func (f *NilFilter) Lt(v interface{}) ValueFilter {
+	return f
+}
+
+// Lte adds a <= filter
+func (f *NilFilter) Lte(v interface{}) ValueFilter {
+	return f
+}
+
+// Gt adds a > filter
+func (f *NilFilter) Gt(v interface{}) ValueFilter {
+	return f
+}
+
+// Gte adds a > filter
+func (f *NilFilter) Gte(v interface{}) ValueFilter {
+	return f
+}

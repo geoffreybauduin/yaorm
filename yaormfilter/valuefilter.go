@@ -10,6 +10,10 @@ type ValueFilter interface {
 	Apply(statement squirrel.SelectBuilder, tableName, fieldName string) squirrel.SelectBuilder
 	Equals(v interface{}) ValueFilter
 	Like(v interface{}) ValueFilter
+	Lt(v interface{}) ValueFilter
+	Lte(v interface{}) ValueFilter
+	Gt(v interface{}) ValueFilter
+	Gte(v interface{}) ValueFilter
 	Nil(v bool) ValueFilter
 	IsEquality() bool
 	GetEquality() interface{}
@@ -24,6 +28,14 @@ type valuefilterimpl struct {
 	shouldLike  bool
 	in_         []interface{}
 	shouldIn    bool
+	lt_         interface{}
+	shouldLt    bool
+	lte_        interface{}
+	shouldLte   bool
+	gt_         interface{}
+	shouldGt    bool
+	gte_        interface{}
+	shouldGte   bool
 }
 
 func (f valuefilterimpl) IsEquality() bool {
@@ -57,6 +69,30 @@ func (f *valuefilterimpl) in(e []interface{}) *valuefilterimpl {
 	return f
 }
 
+func (f *valuefilterimpl) lte(e interface{}) *valuefilterimpl {
+	f.lte_ = e
+	f.shouldLte = true
+	return f
+}
+
+func (f *valuefilterimpl) gte(e interface{}) *valuefilterimpl {
+	f.gte_ = e
+	f.shouldGte = true
+	return f
+}
+
+func (f *valuefilterimpl) lt(e interface{}) *valuefilterimpl {
+	f.lt_ = e
+	f.shouldLt = true
+	return f
+}
+
+func (f *valuefilterimpl) gt(e interface{}) *valuefilterimpl {
+	f.gt_ = e
+	f.shouldGt = true
+	return f
+}
+
 func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fieldName string) squirrel.SelectBuilder {
 	computedField := fmt.Sprintf(`%s.%s`, tableName, fieldName)
 	if f.nil_ != nil {
@@ -83,6 +119,26 @@ func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fie
 	if f.shouldIn {
 		statement = statement.Where(
 			squirrel.Eq{computedField: f.in_},
+		)
+	}
+	if f.shouldLt {
+		statement = statement.Where(
+			squirrel.Lt{computedField: f.lt_},
+		)
+	}
+	if f.shouldLte {
+		statement = statement.Where(
+			squirrel.LtOrEq{computedField: f.lte_},
+		)
+	}
+	if f.shouldGt {
+		statement = statement.Where(
+			squirrel.Gt{computedField: f.gt_},
+		)
+	}
+	if f.shouldGte {
+		statement = statement.Where(
+			squirrel.GtOrEq{computedField: f.gte_},
 		)
 	}
 	return statement
