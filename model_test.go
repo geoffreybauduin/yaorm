@@ -275,6 +275,34 @@ func TestGenericSave_MultiplePrimaryKeys(t *testing.T) {
 	assert.NotEqual(t, posttag.CreatedAt, posttag.UpdatedAt)
 }
 
+func TestGenericSave_MultiplePrimaryKeys_CanBeZeroValue(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider("test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	post := &testdata.Post{Subject: "subject", CategoryID: category.ID}
+	saveModel(t, dbp, post)
+	tag := &testdata.Tag{Tag: "tag"}
+	saveModel(t, dbp, tag)
+	posttag := &testdata.PostTag{TagID: tag.ID, PostID: 0}
+	oldCreated := posttag.CreatedAt
+	posttag.SetDBP(dbp)
+	err = yaorm.GenericSave(posttag)
+	assert.Nil(t, err)
+	assert.NotEqual(t, oldCreated, posttag.CreatedAt)
+	assert.Equal(t, posttag.CreatedAt, posttag.UpdatedAt)
+	found, err := yaorm.GenericSelectOne(dbp, testdata.NewPostTagFilter())
+	assert.Nil(t, err)
+	assert.Equal(t, posttag.PostID, found.(*testdata.PostTag).PostID)
+	assert.Equal(t, posttag.TagID, found.(*testdata.PostTag).TagID)
+	err = yaorm.GenericSave(posttag)
+	assert.Nil(t, err)
+	assert.NotEqual(t, posttag.CreatedAt, posttag.UpdatedAt)
+}
+
 func TestDatabaseModel_Load(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()

@@ -43,3 +43,12 @@ func IsZeroValue(v reflect.Value) bool {
 		return true
 	}
 }
+
+// IsNil returns true if given value is nil
+func IsNil(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Func, reflect.Map, reflect.Slice, reflect.Ptr:
+		return v.IsNil()
+	}
+	return false
+}

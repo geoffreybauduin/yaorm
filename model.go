@@ -198,7 +198,7 @@ func genericSaveMultiplePK(table *Table, m Model, keys map[string]int) error {
 	reflectedModel := tools.GetNonPtrValue(m)
 	for fieldName, idx := range keys {
 		field := reflectedModel.Field(idx)
-		if tools.IsZeroValue(field) {
+		if tools.IsNil(field) {
 			return errors.Errorf("Cannot save this model: one Primary Key has zero value")
 		}
 		filterIdx := table.FilterFieldIndex(fieldName)
