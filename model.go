@@ -281,7 +281,12 @@ func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 		}
 		filterFound := valueF.Field(i)
 		if !filterFound.IsNil() && filterFound.Interface().(yaormfilter.Filter).ShouldSubqueryload() {
-			fkPerModel = feedFkPerModel(m, fkPerModel, dbFieldData)
+			// prevent scope overriding of fkPerModel
+			var err error
+			fkPerModel, err = feedFkPerModel(m, fkPerModel, dbFieldData)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	d, err := subqueryload(dbp, fkPerModel)
@@ -309,16 +314,23 @@ func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 	return nil
 }
 
-func feedFkPerModel(m interface{}, fkPerModel map[string]map[interface{}][]reflect.Value, dbFieldData string) map[string]map[interface{}][]reflect.Value {
+func feedFkPerModel(m interface{}, fkPerModel map[string]map[interface{}][]reflect.Value, dbFieldData string) (map[string]map[interface{}][]reflect.Value, error) {
 	s := reflect.Indirect(reflect.ValueOf(m))
 	if s.Kind() == reflect.Slice {
 		for i := 0; i < s.Len(); i++ {
-			fkPerModel = feedFkPerModel(s.Index(i).Interface(), fkPerModel, dbFieldData)
+			var err error
+			fkPerModel, err = feedFkPerModel(s.Index(i).Interface(), fkPerModel, dbFieldData)
+			if err != nil {
+				return nil, err
+			}
 		}
 	} else {
 		idx, tag := getFieldInModel(m.(Model), "filterload", dbFieldData)
 		if idx > -1 {
 			tagData := strings.Split(tag, ",")
+			if len(tagData) < 2 {
+				return nil, errors.Errorf("tag 'filterload' %+v is invalid, must have at least 2 parts", tagData)
+			}
 			if len(tagData) == 3 {
 				// it's a reverse filter
 				tagData[0] = fmt.Sprintf("%s_per_%s", tagData[0], tagData[2])
@@ -337,13 +349,17 @@ func feedFkPerModel(m interface{}, fkPerModel map[string]map[interface{}][]refle
 					fkPerModel[tagData[0]][fkValue] = append(fkPerModel[tagData[0]][fkValue], s.Field(idx).Addr())
 				}
 			} else {
-				panic("Cannot find fk in model struct")
+				t, err :=  GetTableByModel(m.(Model))
+				if err != nil {
+					return nil, err
+				}
+				return nil, errors.Errorf("Cannot find fk %s in model %s struct", tagData[1], t.Name())
 			}
 		} else {
-			panic(fmt.Errorf("Cannot find tag filterload:%v in model struct", dbFieldData))
+			return nil, errors.Errorf("Cannot find tag filterload:%v in model struct", dbFieldData)
 		}
 	}
-	return fkPerModel
+	return fkPerModel, nil
 }
 
 func getFieldInModel(m Model, tag, equals string) (int, string) {
