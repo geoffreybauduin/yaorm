@@ -55,6 +55,34 @@ func (dm *DatabaseModel) DBHookBeforeUpdate() error {
 	return nil
 }
 
+type cnt struct {
+	Count uint64 `db:"count"`
+}
+
+// GenericCount selects counts the row in the database
+// panics if filter or dbp is nil
+func GenericCount(dbp DBProvider, filter yaormfilter.Filter) (uint64, error) {
+	table, err := GetTableByFilter(filter)
+	if err != nil {
+		return 0, err
+	}
+	statement, err := buildCount(dbp, table)
+	if err != nil {
+		return 0, err
+	}
+	statement = apply(statement, filter, dbp)
+	query, params, err := statement.ToSql()
+	if err != nil {
+		return 0, err
+	}
+	counter := &cnt{}
+	err = dbp.DB().SelectOne(counter, query, params...)
+	if err != nil {
+		return 0, err
+	}
+	return counter.Count, nil
+}
+
 // GenericSelectOne selects one row in the database
 // panics if filter or dbp is nil
 func GenericSelectOne(dbp DBProvider, filter yaormfilter.Filter) (Model, error) {
@@ -159,7 +187,7 @@ func GenericSelectAll(dbp DBProvider, filter yaormfilter.Filter) ([]Model, error
 		}
 		return nil, err
 	}
-	models := []Model{}
+	models := make([]Model, 0)
 	smValue := tools.GetNonPtrValue(sm)
 	for i := 0; i < smValue.Len(); i++ {
 		m := smValue.Index(i).Interface().(Model)

@@ -11,10 +11,14 @@ func buildSelect(dbp DBProvider, m Model) (squirrel.SelectBuilder, error) {
 		return squirrel.SelectBuilder{}, err
 	}
 	fields := table.Fields()
-	f := []string{}
+	var f []string
 	for _, field := range fields {
 		f = append(f, fmt.Sprintf(`%s.%s`, dbp.EscapeValue(table.Name()), dbp.EscapeValue(field)))
 	}
 
 	return dbp.getStatementGenerator().Select(f...).From(dbp.EscapeValue(table.Name())), nil
+}
+
+func buildCount(dbp DBProvider, table *Table) (squirrel.SelectBuilder, error) {
+	return dbp.getStatementGenerator().Select("COUNT(*) AS count").From(dbp.EscapeValue(table.Name())), nil
 }
