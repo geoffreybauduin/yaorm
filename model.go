@@ -377,7 +377,7 @@ func feedFkPerModel(m interface{}, fkPerModel map[string]map[interface{}][]refle
 					fkPerModel[tagData[0]][fkValue] = append(fkPerModel[tagData[0]][fkValue], s.Field(idx).Addr())
 				}
 			} else {
-				t, err :=  GetTableByModel(m.(Model))
+				t, err := GetTableByModel(m.(Model))
 				if err != nil {
 					return nil, err
 				}

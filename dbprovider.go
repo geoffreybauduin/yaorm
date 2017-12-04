@@ -1,6 +1,8 @@
 package yaorm
 
 import (
+	"context"
+
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/geoffreybauduin/yaorm/tools"
@@ -13,28 +15,30 @@ type DBProvider interface {
 	EscapeValue(value string) string
 	CanSelectForUpdate() bool
 	getStatementGenerator() squirrel.StatementBuilderType
+	Context() context.Context
 }
 
 type dbprovider struct {
 	zesty.DBProvider
 	name string
+	ctx  context.Context
 }
 
 // NewDBProvider creates a new db provider
-func NewDBProvider(name string) (DBProvider, error) {
+func NewDBProvider(ctx context.Context, name string) (DBProvider, error) {
 	dblock.RLock()
 	defer dblock.RUnlock()
 	dbp, err := zesty.NewDBProvider(name)
 	if err != nil {
 		return nil, err
 	}
-	return &dbprovider{DBProvider: dbp, name: name}, nil
+	return &dbprovider{DBProvider: dbp, name: name, ctx: ctx}, nil
 }
 
 // DB returns a SQL Executor interface
 func (dbp *dbprovider) DB() gorp.SqlExecutor {
 	db := registry[dbp.name]
-	return &SqlExecutor{DB: db}
+	return &SqlExecutor{DB: db, ctx: dbp.Context()}
 }
 
 // EscapeValue escapes the value sent according to the dialect
@@ -71,4 +75,8 @@ func (dbp *dbprovider) getStatementGenerator() squirrel.StatementBuilderType {
 		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
 	}
 	return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+}
+
+func (dbp *dbprovider) Context() context.Context {
+	return dbp.ctx
 }

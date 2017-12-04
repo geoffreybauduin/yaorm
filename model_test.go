@@ -1,6 +1,7 @@
 package yaorm_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/geoffreybauduin/yaorm"
@@ -14,7 +15,7 @@ func TestGenericSelectOne_NotFound(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	model, err := yaorm.GenericSelectOne(dbp, &testdata.CategoryFilter{})
 	assert.NotNil(t, err)
@@ -30,7 +31,7 @@ func TestGenericSelectOne_NotRegisteredFilter(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	model, err := yaorm.GenericSelectOne(dbp, &fakeFilter{})
 	assert.NotNil(t, err)
@@ -42,7 +43,7 @@ func TestGenericSelectOne(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -57,7 +58,7 @@ func TestGenericInsert(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -73,7 +74,7 @@ func TestGenericUpdate(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -94,7 +95,7 @@ func TestGenericSave(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -111,7 +112,7 @@ func TestGenericSelectAll_NotFound(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	models, err := yaorm.GenericSelectAll(dbp, &testdata.CategoryFilter{})
 	assert.Nil(t, err)
@@ -122,7 +123,7 @@ func TestGenericSelectAll_NotRegisteredFilter(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	models, err := yaorm.GenericSelectAll(dbp, &fakeFilter{})
 	assert.NotNil(t, err)
@@ -134,7 +135,7 @@ func TestGenericSelectAll(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -156,7 +157,7 @@ func TestGenericSelectOne_WithJoinFilters(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -182,7 +183,7 @@ func TestGenericSelectOne_WithSubqueryload(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -203,7 +204,7 @@ func TestGenericSelectAll_WithJoinFilters(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -229,7 +230,7 @@ func TestGenericSelectAll_WithSubqueryload(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -251,7 +252,7 @@ func TestGenericSave_MultiplePrimaryKeys(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -279,7 +280,7 @@ func TestGenericSave_MultiplePrimaryKeys_CanBeZeroValue(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -307,7 +308,7 @@ func TestDatabaseModel_Load(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
@@ -323,7 +324,7 @@ func TestGenericCount(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	m := &testdata.Category{Name: "category"}
 	m.SetDBP(dbp)
@@ -338,7 +339,7 @@ func TestGenericCount_WithJoinFilters(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	category := &testdata.Category{Name: "category"}
 	saveModel(t, dbp, category)
