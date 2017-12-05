@@ -1,22 +1,25 @@
 package yaorm
 
+import "context"
+
 type SqlExecutor struct {
 	DB
+	ctx context.Context
 }
 
 func (e *SqlExecutor) SelectOne(holder interface{}, query string, args ...interface{}) error {
 	hook := e.ExecutorHook()
-	hook.BeforeSelectOne(query, args...)
+	hook.BeforeSelectOne(e.ctx, query, args...)
 	err := e.DB.SelectOne(holder, query, args...)
-	hook.AfterSelectOne(query, args...)
+	hook.AfterSelectOne(e.ctx, query, args...)
 	return err
 }
 
 func (e *SqlExecutor) Select(i interface{}, query string, args ...interface{}) ([]interface{}, error) {
 	hook := e.ExecutorHook()
-	hook.BeforeSelect(query, args...)
+	hook.BeforeSelect(e.ctx, query, args...)
 	v, err := e.DB.Select(i, query, args...)
-	hook.AfterSelect(query, args...)
+	hook.AfterSelect(e.ctx, query, args...)
 	return v, err
 }
 

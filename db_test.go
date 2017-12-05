@@ -1,6 +1,7 @@
 package yaorm_test
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -78,7 +79,7 @@ func TestDb_System(t *testing.T) {
 		AutoCreateTables: true,
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	assert.Equal(t, yaorm.DatabaseSqlite3, dbp.DB().(yaorm.DB).System())
 }
@@ -95,7 +96,7 @@ func TestDb_ExecutorHook(t *testing.T) {
 		AutoCreateTables: true,
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	inst := dbp.DB().(yaorm.DB).ExecutorHook()
 	assert.NotNil(t, inst)
@@ -104,11 +105,11 @@ func TestDb_ExecutorHook(t *testing.T) {
 
 type customExecutorHook struct{}
 
-func (h customExecutorHook) BeforeSelectOne(query string, args ...interface{}) {}
-func (h customExecutorHook) AfterSelectOne(query string, args ...interface{})  {}
+func (h customExecutorHook) BeforeSelectOne(ctx context.Context, query string, args ...interface{}) {}
+func (h customExecutorHook) AfterSelectOne(ctx context.Context, query string, args ...interface{})  {}
 
-func (h customExecutorHook) BeforeSelect(query string, args ...interface{}) {}
-func (h customExecutorHook) AfterSelect(query string, args ...interface{})  {}
+func (h customExecutorHook) BeforeSelect(ctx context.Context, query string, args ...interface{}) {}
+func (h customExecutorHook) AfterSelect(ctx context.Context, query string, args ...interface{})  {}
 
 func TestDb_ExecutorHook_Custom(t *testing.T) {
 	defer func() {
@@ -123,7 +124,7 @@ func TestDb_ExecutorHook_Custom(t *testing.T) {
 		ExecutorHook:     customExecutorHook{},
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider("test")
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
 	inst := dbp.DB().(yaorm.DB).ExecutorHook()
 	assert.NotNil(t, inst)

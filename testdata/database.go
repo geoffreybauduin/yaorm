@@ -1,6 +1,7 @@
 package testdata
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -65,7 +66,7 @@ func setupPostgres(name string) (func(), error) {
 		return nil, err
 	}
 	return func() {
-		dbp, err := yaorm.NewDBProvider(name)
+		dbp, err := yaorm.NewDBProvider(context.TODO(), name)
 		if err != nil {
 			panic(err)
 		}
@@ -96,7 +97,7 @@ func setupMysql(name string) (func(), error) {
 		return nil, err
 	}
 	return func() {
-		dbp, err := yaorm.NewDBProvider(name)
+		dbp, err := yaorm.NewDBProvider(context.TODO(), name)
 		if err != nil {
 			panic(err)
 		}
