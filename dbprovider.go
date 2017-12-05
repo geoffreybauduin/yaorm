@@ -5,6 +5,7 @@ import (
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
+	"github.com/geoffreybauduin/yaorm/_vendor/github.com/satori/go.uuid"
 	"github.com/geoffreybauduin/yaorm/tools"
 	"github.com/go-gorp/gorp"
 )
@@ -16,12 +17,14 @@ type DBProvider interface {
 	CanSelectForUpdate() bool
 	getStatementGenerator() squirrel.StatementBuilderType
 	Context() context.Context
+	UUID() string
 }
 
 type dbprovider struct {
 	zesty.DBProvider
 	name string
 	ctx  context.Context
+	uuid string
 }
 
 // NewDBProvider creates a new db provider
@@ -32,7 +35,11 @@ func NewDBProvider(ctx context.Context, name string) (DBProvider, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &dbprovider{DBProvider: dbp, name: name, ctx: ctx}, nil
+	uuid4 := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	return &dbprovider{DBProvider: dbp, name: name, ctx: ctx, uuid: uuid4.String()}, nil
 }
 
 // DB returns a SQL Executor interface
@@ -77,6 +84,12 @@ func (dbp *dbprovider) getStatementGenerator() squirrel.StatementBuilderType {
 	return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 }
 
+// Context returns the context stored inside this DBProvider instance
 func (dbp *dbprovider) Context() context.Context {
 	return dbp.ctx
+}
+
+// UUID returns an unique identifier for this DBProvider instance
+func (dbp *dbprovider) UUID() string {
+	return dbp.uuid
 }

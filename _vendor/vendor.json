@@ -31,6 +31,12 @@
 			"path": "github.com/loopfz/gadgeto/zesty/utils/rekordo",
 			"revision": "fae4881033fc4a3548c8cf1af798c8e885da1813",
 			"revisionTime": "2017-06-28T13:22:35Z"
+		},
+		{
+			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
+			"revisionTime": "2017-03-21T23:07:31Z"
 		}
 	],
 	"rootPath": "github.com/geoffreybauduin/yaorm"
