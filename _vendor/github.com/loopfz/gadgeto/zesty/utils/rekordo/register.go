@@ -21,6 +21,7 @@ type TableModel struct {
 	Model         interface{}
 	Keys          []string
 	AutoIncrement bool
+	Schema        string
 }
 
 // RegisterTableModel registers a zero-value model to
@@ -32,7 +33,7 @@ func RegisterTableModel(dbName, tableName string, model interface{}) *TableModel
 	defer modelsMu.Unlock()
 
 	if _, ok := models[dbName]; !ok {
-		// Detabase entry does not exists, let's
+		// Database entry does not exists, let's
 		// create it and add a new model for the table.
 		models[dbName] = make(map[string]*TableModel)
 	}
@@ -56,5 +57,11 @@ func (tb *TableModel) WithKeys(keys []string) *TableModel {
 // WithAutoIncrement uses enable for table model keys auto-increment.
 func (tb *TableModel) WithAutoIncrement(enable bool) *TableModel {
 	tb.AutoIncrement = enable
+	return tb
+}
+
+// WithSchema specifies the table exists within a schema
+func (tb *TableModel) WithSchema(schema string) *TableModel {
+	tb.Schema = schema
 	return tb
 }
