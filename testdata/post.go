@@ -7,21 +7,29 @@ import (
 
 type Post struct {
 	yaorm.DatabaseModel
-	ID         int64     `db:"id"`
-	Subject    string    `db:"subject"`
-	CategoryID int64     `db:"category_id"`
-	Category   *Category `db:"-" filterload:"category,category_id"`
+	ID           int64     `db:"id"`
+	Subject      string    `db:"subject"`
+	CategoryID   int64     `db:"category_id"`
+	Category     *Category `db:"-" filterload:"category,category_id"`
+	ParentPostID int64     `db:"parent_post_id"`
+	ChildrenPost []*Post   `db:"-" filterload:"post,id,parent_post_id"`
 }
 
 type PostFilter struct {
 	yaormfilter.ModelFilter
-	FilterID       yaormfilter.ValueFilter `filter:"id"`
-	FilterSubject  yaormfilter.ValueFilter `filter:"subject"`
-	FilterCategory yaormfilter.Filter      `filter:"category,join,id,category_id" filterload:"category"`
+	FilterID           yaormfilter.ValueFilter `filter:"id"`
+	FilterParentPostID yaormfilter.ValueFilter `filter:"parent_post_id"`
+	FilterSubject      yaormfilter.ValueFilter `filter:"subject"`
+	FilterCategory     yaormfilter.Filter      `filter:"category,join,id,category_id" filterload:"category"`
+	FilterChildren     yaormfilter.Filter      `filter:"post,join,parent_post_id,id" filterload:"post"`
 }
 
 func init() {
-	yaorm.NewTable("test", "post", &Post{}).WithFilter(&PostFilter{})
+	yaorm.NewTable("test", "post", &Post{}).WithFilter(&PostFilter{}).WithSubqueryloading(
+		func(dbp yaorm.DBProvider, ids []interface{}) (interface{}, error) {
+			return yaorm.GenericSelectAll(dbp, NewPostFilter().ParentPostID(yaormfilter.In(ids...)))
+		}, "parent_post_id",
+	)
 }
 
 func NewPostFilter() *PostFilter {
@@ -30,6 +38,11 @@ func NewPostFilter() *PostFilter {
 
 func (f *PostFilter) ID(v yaormfilter.ValueFilter) *PostFilter {
 	f.FilterID = v
+	return f
+}
+
+func (f *PostFilter) ParentPostID(v yaormfilter.ValueFilter) *PostFilter {
+	f.FilterParentPostID = v
 	return f
 }
 
@@ -43,6 +56,14 @@ func (f *PostFilter) Category(v yaormfilter.Filter) *PostFilter {
 		panic("Not a CategoryFilter")
 	}
 	f.FilterCategory = v
+	return f
+}
+
+func (f *PostFilter) ChildrenPosts(v yaormfilter.Filter) *PostFilter {
+	if _, ok := v.(*PostFilter); !ok {
+		panic("Not a PostFilter")
+	}
+	f.FilterChildren = v
 	return f
 }
 
