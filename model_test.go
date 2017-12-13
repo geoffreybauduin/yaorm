@@ -359,3 +359,28 @@ func TestGenericCount_WithJoinFilters(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(0), modelFound)
 }
+
+func TestGenericSelectOne_WithSubqueryloadRecursive(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category2"}
+	saveModel(t, dbp, category2)
+	post := &testdata.Post{Subject: "subject", CategoryID: category2.ID}
+	saveModel(t, dbp, post)
+	post2 := &testdata.Post{Subject: "subject", CategoryID: category2.ID, ParentPostID: post.ID}
+	saveModel(t, dbp, post2)
+	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().ChildrenPosts(
+		testdata.NewPostFilter().Subqueryload(),
+	).ID(
+		yaormfilter.Equals(post.ID),
+	))
+	assert.Nil(t, err)
+	assert.Equal(t, post.ID, modelFound.(*testdata.Post).ID)
+	assert.Len(t, modelFound.(*testdata.Post).ChildrenPost, 1)
+	assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ChildrenPost[0].ID)
+}
