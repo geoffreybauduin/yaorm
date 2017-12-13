@@ -36,6 +36,14 @@ func getTableNameFromFilter(f yaormfilter.Filter) string {
 	return table.Name()
 }
 
+func getTableFromFilter(f yaormfilter.Filter) *Table {
+	table, err := GetTableByFilter(f)
+	if err != nil {
+		return nil
+	}
+	return table
+}
+
 func apply(statement squirrel.SelectBuilder, f yaormfilter.Filter, dbp DBProvider) squirrel.SelectBuilder {
 	applier := &filterApplier{
 		statement: statement,
@@ -171,7 +179,7 @@ func (a *filterFieldApplier) applyFilter(f yaormfilter.Filter, tableName string)
 func (a *filterFieldApplier) join(f yaormfilter.Filter, tableAlias string) {
 	joinCondition := fmt.Sprintf(
 		`%s as %s on %s.%s = %s.%s`,
-		a.dbp.EscapeValue(getTableNameFromFilter(f)),
+		getTableFromFilter(f).NameForQuery(a.dbp),
 		a.dbp.EscapeValue(tableAlias),
 		a.dbp.EscapeValue(tableAlias),
 		a.dbp.EscapeValue(a.tagData[2]),

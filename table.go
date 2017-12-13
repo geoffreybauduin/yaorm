@@ -42,6 +42,7 @@ type Table struct {
 	keys                []string
 	fieldsByDbKey       map[string]int
 	filterFieldsByDbKey map[string]int
+	schema              string
 }
 
 // NewTable registers a new table
@@ -54,6 +55,7 @@ func NewTable(dbName, tableName string, model Model) *Table {
 		fieldsByDbKey:       map[string]int{},
 		filterFieldsByDbKey: map[string]int{},
 		keys:                []string{},
+		schema:              "",
 	}
 	err := table.retrieveFields()
 	if err != nil {
@@ -139,6 +141,12 @@ func (t *Table) retrieveFilterFields() {
 func (t *Table) WithKeys(keys []string) *Table {
 	t.keys = keys
 	t.tm = t.tm.WithKeys(keys)
+	return t
+}
+
+func (t *Table) WithSchema(schema string) *Table {
+	t.schema = schema
+	t.tm = t.tm.WithSchema(schema)
 	return t
 }
 
@@ -239,4 +247,9 @@ func (t Table) NewSlicePtr() (interface{}, error) {
 	sliceType := reflect.SliceOf(reflect.ValueOf(m).Type())
 	slice := reflect.MakeSlice(sliceType, 1, 1)
 	return reflect.New(slice.Type()).Interface(), nil
+}
+
+// NameForQuery returns the name that should be used for SQL queries
+func (t Table) NameForQuery(dbp DBProvider) string {
+	return dbp.getDialect().QuotedTableForQuery(t.schema, t.Name())
 }

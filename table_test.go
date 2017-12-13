@@ -1,6 +1,7 @@
 package yaorm_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/geoffreybauduin/yaorm"
@@ -106,4 +107,16 @@ func TestGetTableByModel(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, foundTable)
 	assert.Equal(t, table, foundTable)
+}
+
+func TestTable_NameForQuery(t *testing.T) {
+	killDB, err := testdata.SetupTestDatabase("test")
+	defer killDB()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+
+	table, err := yaorm.GetTable("test", "category")
+	assert.Nil(t, err)
+	assert.Contains(t, table.NameForQuery(dbp), "category")
 }

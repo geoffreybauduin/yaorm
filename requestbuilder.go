@@ -16,7 +16,9 @@ func buildSelect(dbp DBProvider, m Model) (squirrel.SelectBuilder, error) {
 		f = append(f, fmt.Sprintf(`%s.%s`, dbp.EscapeValue(table.Name()), dbp.EscapeValue(field)))
 	}
 
-	return dbp.getStatementGenerator().Select(f...).From(dbp.EscapeValue(table.Name())), nil
+	return dbp.getStatementGenerator().Select(f...).From(
+		fmt.Sprintf("%s AS %s", table.NameForQuery(dbp), table.Name()),
+	), nil
 }
 
 func buildCount(dbp DBProvider, table *Table) (squirrel.SelectBuilder, error) {

@@ -18,6 +18,8 @@ type DBProvider interface {
 	getStatementGenerator() squirrel.StatementBuilderType
 	Context() context.Context
 	UUID() string
+	getDialect() gorp.Dialect
+	HasCapacity(capacity DatabaseCapacity) bool
 }
 
 type dbprovider struct {
@@ -92,4 +94,13 @@ func (dbp *dbprovider) Context() context.Context {
 // UUID returns an unique identifier for this DBProvider instance
 func (dbp *dbprovider) UUID() string {
 	return dbp.uuid
+}
+
+// HasCapacity returns true if used database has the provided capacity
+func (dbp *dbprovider) HasCapacity(capacity DatabaseCapacity) bool {
+	system := dbp.getDb().System()
+	if _, ok := databaseCapacities[system]; !ok {
+		return false
+	}
+	return databaseCapacities[system][capacity]
 }

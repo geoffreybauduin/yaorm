@@ -3,6 +3,7 @@ package rekordo
 import (
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/go-gorp/gorp"
@@ -65,7 +66,12 @@ func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter, dialect gorp.Di
 	modelsMu.Lock()
 	tableModels := models[db.Name]
 	for _, t := range tableModels {
-		dbmap.AddTableWithName(t.Model, t.Name).SetKeys(t.AutoIncrement, t.Keys...)
+		// using gorp dialect to know if the driver supports schemas
+		if t.Schema == "" || !strings.Contains(dialect.QuotedTableForQuery("schema", "table"), "schema") {
+			dbmap.AddTableWithName(t.Model, t.Name).SetKeys(t.AutoIncrement, t.Keys...)
+		} else {
+			dbmap.AddTableWithNameAndSchema(t.Model, t.Schema, t.Name).SetKeys(t.AutoIncrement, t.Keys...)
+		}
 	}
 	modelsMu.Unlock()
 
