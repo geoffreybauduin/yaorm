@@ -218,6 +218,27 @@ func GenericSave(m Model) error {
 	return genericSaveMultiplePK(table, m, keys)
 }
 
+// SaveWithPrimaryKeys updates or inserts the provided model in the database, using the provided keys to
+// check if it exists
+func SaveWithPrimaryKeys(m Model, keys []string) error {
+	table, err := GetTableByModel(m)
+	if err != nil {
+		return err
+	}
+	keyIndices := table.KeyFields()
+	keysMap := map[string]int{}
+	for _, key := range keys {
+		if _, ok := keyIndices[key]; !ok {
+			return errors.Errorf("Field %s is not a primary key of table %s", key, table.Name())
+		}
+		keysMap[key] = table.FieldIndex(key)
+		if keysMap[key] == -1 {
+			return errors.Errorf("Field %s is not defined in table %s", key, table.Name())
+		}
+	}
+	return genericSaveMultiplePK(table, m, keysMap)
+}
+
 func genericSaveMultiplePK(table *Table, m Model, keys map[string]int) error {
 	f, err := table.NewFilter()
 	if err != nil {
