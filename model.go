@@ -230,6 +230,9 @@ func genericSaveMultiplePK(table *Table, m Model, keys map[string]int) error {
 			return errors.Errorf("Cannot save this model: one Primary Key has zero value")
 		}
 		filterIdx := table.FilterFieldIndex(fieldName)
+		if filterIdx == -1 {
+			return errors.Errorf("Cannot find field %s inside table %s filter", fieldName, table.Name())
+		}
 		tools.GetNonPtrValue(f).Field(filterIdx).Set(reflect.ValueOf(yaormfilter.Equals(field.Interface())))
 	}
 	_, err = GenericSelectOne(m.GetDBP(), f)
