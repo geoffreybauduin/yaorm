@@ -414,3 +414,21 @@ func TestSaveWithPrimaryKeys(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "regular", postType.(*testdata.PostType).Type)
 }
+
+func TestGenericSelectOne_WithSubqueryloadSliceFilter(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	post := &testdata.Post{Subject: "subject", CategoryID: 1}
+	saveModel(t, dbp, post)
+	pm := &testdata.PostMetadata{PostID: post.ID, Key: "test", Value: "foo"}
+	saveModel(t, dbp, pm)
+	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().Metadata(
+		testdata.NewPostMetadataFilter().Subqueryload(),
+		testdata.NewPostMetadataFilter().Subqueryload(),
+	))
+	assert.Nil(t, err)
+	assert.Len(t, modelFound.(*testdata.Post).Metadata, 1)
+}

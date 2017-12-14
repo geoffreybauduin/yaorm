@@ -317,6 +317,22 @@ func formatTablenameFromError(m Model) string {
 	return strings.Join(words, "")
 }
 
+func filterShouldSubqueryload(filterFound reflect.Value) bool {
+	f := filterFound.Interface()
+	switch f.(type) {
+	case yaormfilter.Filter:
+		return f.(yaormfilter.Filter).ShouldSubqueryload()
+	case []yaormfilter.Filter:
+		arr := f.([]yaormfilter.Filter)
+		for _, arrElem := range arr {
+			if arrElem.ShouldSubqueryload() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 	fkPerModel := map[string]map[interface{}][]reflect.Value{}
 	valueF := reflect.Indirect(reflect.ValueOf(f))
@@ -332,7 +348,7 @@ func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 			continue
 		}
 		filterFound := valueF.Field(i)
-		if !filterFound.IsNil() && filterFound.Interface().(yaormfilter.Filter).ShouldSubqueryload() {
+		if !filterFound.IsNil() && filterShouldSubqueryload(filterFound) {
 			// prevent scope overriding of fkPerModel
 			var err error
 			fkPerModel, err = feedFkPerModel(m, fkPerModel, dbFieldData)
@@ -355,8 +371,8 @@ func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 				continue
 			}
 			filterFound := valueF.Field(i)
-			if !filterFound.IsNil() && filterFound.Interface().(yaormfilter.Filter).ShouldSubqueryload() {
-				err = finishSelect(dbp, data, filterFound.Interface().(yaormfilter.Filter))
+			if !filterFound.IsNil() && filterShouldSubqueryload(filterFound) {
+				err = finishSelectFromFilter(dbp, data, filterFound.Interface())
 				if err != nil {
 					return err
 				}
@@ -364,6 +380,27 @@ func finishSelect(dbp DBProvider, m interface{}, f yaormfilter.Filter) error {
 		}
 	}
 	return nil
+}
+
+func finishSelectFromFilter(dbp DBProvider, m interface{}, f interface{}) error {
+	switch f.(type) {
+	case yaormfilter.Filter:
+		err := finishSelect(dbp, m, f.(yaormfilter.Filter))
+		if err != nil {
+			return err
+		}
+		return nil
+	case []yaormfilter.Filter:
+		arr := f.([]yaormfilter.Filter)
+		for _, arrElem := range arr {
+			err := finishSelect(dbp, m, arrElem)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	return errors.Errorf("Could not cast filter provided to correct type")
 }
 
 func feedFkPerModel(m interface{}, fkPerModel map[string]map[interface{}][]reflect.Value, dbFieldData string) (map[string]map[interface{}][]reflect.Value, error) {
