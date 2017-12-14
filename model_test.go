@@ -385,6 +385,20 @@ func TestGenericSelectOne_WithSubqueryloadRecursive(t *testing.T) {
 	assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ChildrenPost[0].ID)
 }
 
+func TestGenericSelectOne_TableNameStartsWithNumber(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	twoi := &testdata.TwoI{Name: "category"}
+	saveModel(t, dbp, twoi)
+	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewTwoIFilter().Name(yaormfilter.Equals(twoi.Name)))
+	if assert.Nil(t, err) {
+		assert.Equal(t, twoi.ID, modelFound.(*testdata.TwoI).ID)
+	}
+}
+
 func TestGenericSave_2PK_MissingFilterField(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()

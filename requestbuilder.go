@@ -17,7 +17,7 @@ func buildSelect(dbp DBProvider, m Model) (squirrel.SelectBuilder, error) {
 	}
 
 	return dbp.getStatementGenerator().Select(f...).From(
-		fmt.Sprintf("%s AS %s", table.NameForQuery(dbp), table.Name()),
+		fmt.Sprintf("%s AS %s", table.NameForQuery(dbp), dbp.EscapeValue(table.Name())),
 	), nil
 }
 
