@@ -385,7 +385,7 @@ func TestGenericSelectOne_WithSubqueryloadRecursive(t *testing.T) {
 	assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ChildrenPost[0].ID)
 }
 
-func TestGenericSelectOne_2PK_MissingFilterField(t *testing.T) {
+func TestGenericSave_2PK_MissingFilterField(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
 	assert.Nil(t, err)
@@ -397,4 +397,20 @@ func TestGenericSelectOne_2PK_MissingFilterField(t *testing.T) {
 	if assert.NotNil(t, err) {
 		assert.Equal(t, err.Error(), "Cannot find field tag_id inside table invalid_post_tag filter")
 	}
+}
+
+func TestSaveWithPrimaryKeys(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	m := &testdata.PostType{PostID: 1, Type: "regular"}
+	m.SetDBP(dbp)
+	err = m.Save()
+	assert.Nil(t, err)
+
+	postType, err := yaorm.GenericSelectOne(dbp, testdata.NewPostTypeFilter().PostID(yaormfilter.Equals(int64(1))))
+	assert.Nil(t, err)
+	assert.Equal(t, "regular", postType.(*testdata.PostType).Type)
 }
