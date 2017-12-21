@@ -446,4 +446,3 @@ func TestGenericSelectOne_WithSubqueryloadSliceFilter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, modelFound.(*testdata.Post).Metadata, 1)
 }
-

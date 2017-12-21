@@ -205,6 +205,18 @@ func (t Table) FieldIndex(field string) int {
 	return idx
 }
 
+func (t Table) FieldsWithoutPK() []string {
+	keys := t.KeyFields()
+	fields := make([]string, 0)
+	for _, f := range t.Fields() {
+		if _, ok := keys[f]; ok {
+			continue
+		}
+		fields = append(fields, f)
+	}
+	return fields
+}
+
 func (t Table) FilterFieldIndex(field string) int {
 	idx, ok := t.filterFieldsByDbKey[field]
 	if !ok {
