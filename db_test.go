@@ -103,7 +103,9 @@ func TestDb_ExecutorHook(t *testing.T) {
 	assert.IsType(t, inst, &yaorm.DefaultExecutorHook{})
 }
 
-type customExecutorHook struct{}
+type customExecutorHook struct {
+	yaorm.DefaultExecutorHook
+}
 
 func (h customExecutorHook) BeforeSelectOne(ctx context.Context, query string, args ...interface{}) {}
 func (h customExecutorHook) AfterSelectOne(ctx context.Context, query string, args ...interface{})  {}
