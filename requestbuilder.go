@@ -2,6 +2,8 @@ package yaorm
 
 import (
 	"fmt"
+	"reflect"
+
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 	"github.com/geoffreybauduin/yaorm/tools"
@@ -27,6 +29,22 @@ func buildCount(dbp DBProvider, table *Table) (squirrel.SelectBuilder, error) {
 	return dbp.getStatementGenerator().Select("COUNT(*) AS count").From(dbp.EscapeValue(table.Name())), nil
 }
 
+func getNiceArgumentFormatted(v interface{}) string {
+	if v == nil {
+		return "nil"
+	}
+	value := reflect.ValueOf(v)
+	if tools.IsZeroValue(value) {
+		return fmt.Sprintf("%v", v)
+	}
+	switch value.Kind() {
+	case reflect.Ptr:
+		return getNiceArgumentFormatted(reflect.Indirect(value).Interface())
+
+	}
+	return fmt.Sprintf("%v", v)
+}
+
 func buildInsert(dbp DBProvider, m Model) (squirrel.InsertBuilder, error) {
 	table, err := GetTableByModel(m)
 	if err != nil {
@@ -36,7 +54,7 @@ func buildInsert(dbp DBProvider, m Model) (squirrel.InsertBuilder, error) {
 	stmt := dbp.getStatementGenerator().Insert(table.Name()).Columns(table.FieldsWithoutPK()...)
 	var values []interface{}
 	for _, field := range table.FieldsWithoutPK() {
-		values = append(values, reflectedM.Field(table.FieldIndex(field)).Interface())
+		values = append(values, getNiceArgumentFormatted(reflectedM.Field(table.FieldIndex(field)).Interface()))
 	}
 	stmt = stmt.Values(values...)
 	return stmt, nil
@@ -50,10 +68,10 @@ func buildUpdate(dbp DBProvider, m Model) (squirrel.UpdateBuilder, error) {
 	reflectedM := tools.GetNonPtrValue(m)
 	stmt := dbp.getStatementGenerator().Update(table.Name())
 	for _, field := range table.FieldsWithoutPK() {
-		stmt = stmt.Set(field, reflectedM.Field(table.FieldIndex(field)).Interface())
+		stmt = stmt.Set(field, getNiceArgumentFormatted(reflectedM.Field(table.FieldIndex(field)).Interface()))
 	}
 	for pk, idx := range table.KeyFields() {
-		stmt = stmt.Where(squirrel.Eq{pk: reflectedM.Field(idx).Interface()})
+		stmt = stmt.Where(squirrel.Eq{pk: tools.GetNonPtrInterface(reflectedM.Field(idx).Interface())})
 	}
 	return stmt, nil
 }
@@ -66,7 +84,7 @@ func buildDelete(dbp DBProvider, m Model) (squirrel.DeleteBuilder, error) {
 	reflectedM := tools.GetNonPtrValue(m)
 	stmt := dbp.getStatementGenerator().Delete(table.Name())
 	for pk, idx := range table.KeyFields() {
-		stmt = stmt.Where(squirrel.Eq{pk: reflectedM.Field(idx).Interface()})
+		stmt = stmt.Where(squirrel.Eq{pk: getNiceArgumentFormatted(reflectedM.Field(idx).Interface())})
 	}
 	return stmt, nil
 }
