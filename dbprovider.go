@@ -46,8 +46,14 @@ func NewDBProvider(ctx context.Context, name string) (DBProvider, error) {
 
 // DB returns a SQL Executor interface
 func (dbp *dbprovider) DB() gorp.SqlExecutor {
-	db := registry[dbp.name]
-	return &SqlExecutor{DB: db, ctx: dbp.Context(), dbp: dbp}
+	dbRetrieved := dbp.getDb()
+	dbUsed := dbp.DBProvider.DB()
+	return &SqlExecutor{
+		SqlExecutor: dbUsed,
+		db:          dbRetrieved,
+		ctx:         dbp.Context(),
+		dbp:         dbp,
+	}
 }
 
 // EscapeValue escapes the value sent according to the dialect
@@ -70,10 +76,9 @@ func (dbp *dbprovider) getDb() DB {
 }
 
 func (dbp *dbprovider) getDialect() gorp.Dialect {
-	v := tools.GetNonPtrValue(dbp.DB())
-	dbField := tools.GetNonPtrValue(v.FieldByName("DB").Interface()).FieldByName("DB")
-	realValue := tools.GetNonPtrValue(dbField.Interface())
-	field := realValue.FieldByName("DbMap")
+	v := tools.GetNonPtrValue(dbp.getDb())
+	dbField := tools.GetNonPtrValue(v.FieldByName("DB").Interface())
+	field := dbField.FieldByName("DbMap")
 	s := field.Interface().(*gorp.DbMap)
 	return s.Dialect
 }

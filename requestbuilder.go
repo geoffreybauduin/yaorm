@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 	"github.com/geoffreybauduin/yaorm/tools"
 )
