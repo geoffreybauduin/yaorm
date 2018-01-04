@@ -1,17 +1,22 @@
 package yaorm
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-gorp/gorp"
+)
 
 type SqlExecutor struct {
-	DB
+	gorp.SqlExecutor
+	db  DB
 	ctx context.Context
 	dbp DBProvider
 }
 
 func (e *SqlExecutor) SelectOne(holder interface{}, query string, args ...interface{}) error {
-	hook := e.ExecutorHook()
+	hook := e.db.ExecutorHook()
 	hook.BeforeSelectOne(e.ctx, query, args...)
-	err := e.DB.SelectOne(holder, query, args...)
+	err := e.SqlExecutor.SelectOne(holder, query, args...)
 	hook.AfterSelectOne(e.ctx, query, args...)
 	return err
 }
@@ -22,15 +27,15 @@ type queryArgs struct {
 }
 
 func (e *SqlExecutor) Select(i interface{}, query string, args ...interface{}) ([]interface{}, error) {
-	hook := e.ExecutorHook()
+	hook := e.db.ExecutorHook()
 	hook.BeforeSelect(e.ctx, query, args...)
-	v, err := e.DB.Select(i, query, args...)
+	v, err := e.SqlExecutor.Select(i, query, args...)
 	hook.AfterSelect(e.ctx, query, args...)
 	return v, err
 }
 
 func (e *SqlExecutor) Insert(list ...interface{}) error {
-	hook := e.ExecutorHook()
+	hook := e.db.ExecutorHook()
 	for _, item := range list {
 		var qArg queryArgs
 		builder, err := buildInsert(e.dbp, item.(Model))
@@ -42,7 +47,7 @@ func (e *SqlExecutor) Insert(list ...interface{}) error {
 			return err
 		}
 		hook.BeforeInsert(e.ctx, qArg.query, qArg.args...)
-		err = e.DB.Insert(item)
+		err = e.SqlExecutor.Insert(item)
 		if err != nil {
 			return err
 		}
@@ -52,7 +57,7 @@ func (e *SqlExecutor) Insert(list ...interface{}) error {
 }
 
 func (e *SqlExecutor) Update(list ...interface{}) (int64, error) {
-	hook := e.ExecutorHook()
+	hook := e.db.ExecutorHook()
 	var rv int64
 	for _, item := range list {
 		var qArg queryArgs
@@ -65,7 +70,7 @@ func (e *SqlExecutor) Update(list ...interface{}) (int64, error) {
 			return rv, err
 		}
 		hook.BeforeUpdate(e.ctx, qArg.query, qArg.args...)
-		v, err := e.DB.Update(item)
+		v, err := e.SqlExecutor.Update(item)
 		if err != nil {
 			return rv, err
 		}
@@ -76,7 +81,7 @@ func (e *SqlExecutor) Update(list ...interface{}) (int64, error) {
 }
 
 func (e *SqlExecutor) Delete(list ...interface{}) (int64, error) {
-	hook := e.ExecutorHook()
+	hook := e.db.ExecutorHook()
 	var rv int64
 	for _, item := range list {
 		var qArg queryArgs
@@ -89,7 +94,7 @@ func (e *SqlExecutor) Delete(list ...interface{}) (int64, error) {
 			return rv, err
 		}
 		hook.BeforeDelete(e.ctx, qArg.query, qArg.args...)
-		v, err := e.DB.Delete(item)
+		v, err := e.SqlExecutor.Delete(item)
 		if err != nil {
 			return rv, err
 		}

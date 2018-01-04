@@ -79,9 +79,11 @@ func TestDb_System(t *testing.T) {
 		AutoCreateTables: true,
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	_, err = yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
-	assert.Equal(t, yaorm.DatabaseSqlite3, dbp.DB().(yaorm.DB).System())
+	db, err := yaorm.GetDB("test")
+	assert.Nil(t, err)
+	assert.Equal(t, yaorm.DatabaseSqlite3, db.System())
 }
 
 func TestDb_ExecutorHook(t *testing.T) {
@@ -96,9 +98,11 @@ func TestDb_ExecutorHook(t *testing.T) {
 		AutoCreateTables: true,
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	_, err = yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
-	inst := dbp.DB().(yaorm.DB).ExecutorHook()
+	db, err := yaorm.GetDB("test")
+	assert.Nil(t, err)
+	inst := db.ExecutorHook()
 	assert.NotNil(t, inst)
 	assert.IsType(t, inst, &yaorm.DefaultExecutorHook{})
 }
@@ -126,9 +130,11 @@ func TestDb_ExecutorHook_Custom(t *testing.T) {
 		ExecutorHook:     customExecutorHook{},
 	})
 	assert.Nil(t, err)
-	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	_, err = yaorm.NewDBProvider(context.TODO(), "test")
 	assert.Nil(t, err)
-	inst := dbp.DB().(yaorm.DB).ExecutorHook()
+	db, err := yaorm.GetDB("test")
+	assert.Nil(t, err)
+	inst := db.ExecutorHook()
 	assert.NotNil(t, inst)
 	assert.IsType(t, inst, &customExecutorHook{})
 }
