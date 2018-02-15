@@ -99,3 +99,25 @@ func TestFilterApplier_ApplyWithOrderBy(t *testing.T) {
 	assert.Equal(t, models[0].(*testdata.Category).ID, category.ID)
 	assert.Equal(t, models[1].(*testdata.Category).ID, category2.ID)
 }
+
+func TestFilterApplier_ApplyWithLimitAndOffset(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category2"}
+	saveModel(t, dbp, category2)
+
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().Limit(1))
+	assert.Nil(t, err)
+	assert.Len(t, models, 1)
+	assert.Equal(t, models[0].(*testdata.Category).ID, category.ID)
+
+	models, err = yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().Limit(1).Offset(1))
+	assert.Nil(t, err)
+	assert.Len(t, models, 1)
+	assert.Equal(t, models[0].(*testdata.Category).ID, category2.ID)
+}
