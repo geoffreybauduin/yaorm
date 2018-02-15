@@ -72,3 +72,13 @@ func (f *CategoryFilter) OrderBy(field string, way yaormfilter.OrderingWay) yaor
 	f.SetOrderBy(field, way)
 	return f
 }
+
+func (f *CategoryFilter) Limit(limit uint64) yaormfilter.Filter {
+	f.SetLimit(limit)
+	return f
+}
+
+func (f *CategoryFilter) Offset(offset uint64) yaormfilter.Filter {
+	f.SetOffset(offset)
+	return f
+}

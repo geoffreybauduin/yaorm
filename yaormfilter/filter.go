@@ -10,6 +10,10 @@ type Filter interface {
 	GetSelectOptions() []RequestOption
 	OrderBy(field string, way OrderingWay) Filter
 	GetOrderBy() []*OrderBy
+	Limit(limit uint64) Filter
+	Offset(offset uint64) Filter
+	GetLimit() (bool, uint64)
+	GetOffset() (bool, uint64)
 }
 
 // OrderingWay is a custom type to have ordering
@@ -41,6 +45,10 @@ type ModelFilter struct {
 	subqueryload bool
 	options      []RequestOption
 	orderBy      []*OrderBy
+	shouldLimit  bool
+	limit        uint64
+	shouldOffset bool
+	offset       uint64
 }
 
 type OrderBy struct {
@@ -94,4 +102,30 @@ func (mf *ModelFilter) GetSelectOptions() []RequestOption {
 		}
 	}
 	return opts
+}
+
+func (mf *ModelFilter) Limit(limit uint64) Filter {
+	panic(errors.NotImplementedf("Limit"))
+}
+
+func (mf *ModelFilter) Offset(limit uint64) Filter {
+	panic(errors.NotImplementedf("Offset"))
+}
+
+func (mf *ModelFilter) SetLimit(limit uint64) {
+	mf.shouldLimit = true
+	mf.limit = limit
+}
+
+func (mf *ModelFilter) SetOffset(offset uint64) {
+	mf.shouldOffset = true
+	mf.offset = offset
+}
+
+func (mf *ModelFilter) GetLimit() (bool, uint64) {
+	return mf.shouldLimit, mf.limit
+}
+
+func (mf *ModelFilter) GetOffset() (bool, uint64) {
+	return mf.shouldOffset, mf.offset
 }

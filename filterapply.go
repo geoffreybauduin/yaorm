@@ -66,6 +66,12 @@ func apply(statement squirrel.SelectBuilder, f yaormfilter.Filter, dbp DBProvide
 			fmt.Sprintf("%s.%s %s", dbp.EscapeValue(applier.tableName), dbp.EscapeValue(orderBy.Field), orderBy.Way),
 		)
 	}
+	if shouldLimit, limit := f.GetLimit(); shouldLimit {
+		statement = statement.Limit(limit)
+	}
+	if shouldOffset, offset := f.GetOffset(); shouldOffset {
+		statement = statement.Offset(offset)
+	}
 	return statement
 }
 
