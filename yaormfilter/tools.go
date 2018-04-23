@@ -20,6 +20,8 @@ func Equals(v interface{}) ValueFilter {
 		if _, ok := underlyingValue.Interface().(time.Time); ok {
 			return NewDateFilter().Equals(v)
 		}
+	case reflect.Bool:
+		return NewBoolFilter().Equals(v)
 	}
 	if v == nil {
 		return NewNilFilter().Nil(true)
@@ -48,6 +50,8 @@ func In(values ...interface{}) ValueFilter {
 		return NewInt64Filter().In(values...)
 	case reflect.String:
 		return NewStringFilter().In(values...)
+	case reflect.Bool:
+		return NewBoolFilter().In(values...)
 	case reflect.Slice:
 		// if we receive a slice, we want to go through all the slices received an concat them inside one
 		data := []interface{}{}
