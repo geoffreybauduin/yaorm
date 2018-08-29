@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/go-gorp/gorp"
@@ -24,6 +25,7 @@ type DatabaseConfig struct {
 	MaxOpenConns     int
 	MaxIdleConns     int
 	AutoCreateTables bool
+	ConnMaxLifetime  time.Duration
 }
 
 // RegisterDatabase creates a gorp map with tables and tc and
@@ -44,6 +46,7 @@ func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter, dialect gorp.Di
 		db.MaxIdleConns = maxIdleConns
 	}
 	dbConn.SetMaxIdleConns(db.MaxIdleConns)
+	dbConn.SetConnMaxLifetime(db.ConnMaxLifetime)
 
 	// Select the proper dialect used by gorp.
 	if dialect == nil {
