@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty"
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/loopfz/gadgeto/zesty/utils/rekordo"
@@ -50,6 +51,7 @@ type DatabaseConfiguration struct {
 	DSN              string
 	MaxOpenConns     int
 	MaxIdleConns     int
+	ConnMaxLifetime  time.Duration
 	AutoCreateTables bool
 	// Dialect database dialect, leave empty for automatic guessing
 	Dialect gorp.Dialect
@@ -82,6 +84,7 @@ func RegisterDB(config *DatabaseConfiguration) error {
 		AutoCreateTables: config.AutoCreateTables,
 		MaxIdleConns:     config.MaxIdleConns,
 		MaxOpenConns:     config.MaxOpenConns,
+		ConnMaxLifetime:  config.ConnMaxLifetime,
 	}
 
 	// Register database.
