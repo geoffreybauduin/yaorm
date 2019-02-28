@@ -29,6 +29,27 @@ func Equals(v interface{}) ValueFilter {
 	panic(fmt.Errorf("Unknown type: %+v for value %+v in Equals filter", underlyingValue.Kind(), v))
 }
 
+// NotEquals returns the correct filter according the value sent
+func NotEquals(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().NotEquals(v)
+	case reflect.String:
+		return NewStringFilter().NotEquals(v)
+	case reflect.Struct:
+		if _, ok := underlyingValue.Interface().(time.Time); ok {
+			return NewDateFilter().NotEquals(v)
+		}
+	case reflect.Bool:
+		return NewBoolFilter().NotEquals(v)
+	}
+	if v == nil {
+		return NewNilFilter().Nil(true)
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in NotEquals filter", underlyingValue.Kind(), v))
+}
+
 // In returns the correct filter according to the value sent
 func In(values ...interface{}) ValueFilter {
 	var t reflect.Type

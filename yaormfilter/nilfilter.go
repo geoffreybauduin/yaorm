@@ -15,6 +15,11 @@ func (f *NilFilter) Equals(v interface{}) ValueFilter {
 	return f
 }
 
+// NotEquals applies an notEqual filter
+func (f *NilFilter) NotEquals(v interface{}) ValueFilter {
+	return f
+}
+
 // Like is not applicable on Date
 func (f *NilFilter) Like(v interface{}) ValueFilter {
 	return f

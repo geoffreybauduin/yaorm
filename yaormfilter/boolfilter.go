@@ -31,6 +31,12 @@ func (f *BoolFilter) Equals(v interface{}) ValueFilter {
 	return f
 }
 
+// NotEquals adds an notEqual filter
+func (f *BoolFilter) NotEquals(v interface{}) ValueFilter {
+	f.notEquals(f.getValue(v))
+	return f
+}
+
 // Like is not applicable on bool
 func (f *BoolFilter) Like(v interface{}) ValueFilter {
 	return f

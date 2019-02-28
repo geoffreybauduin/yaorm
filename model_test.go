@@ -333,6 +333,17 @@ func TestGenericCount(t *testing.T) {
 	modelFound, err := yaorm.GenericCount(dbp, testdata.NewCategoryFilter().Name(yaormfilter.Equals("category")))
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), modelFound)
+	modelFound, err = yaorm.GenericCount(dbp, testdata.NewCategoryFilter().Name(yaormfilter.NotEquals("category")))
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(0), modelFound)
+
+	m = &testdata.Category{Name: "other"}
+	m.SetDBP(dbp)
+	err = yaorm.GenericSave(m)
+	assert.Nil(t, err)
+	modelFound, err = yaorm.GenericCount(dbp, testdata.NewCategoryFilter().Name(yaormfilter.NotEquals("category")))
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), modelFound) // catch "other"
 }
 
 func TestGenericCount_WithJoinFilters(t *testing.T) {
