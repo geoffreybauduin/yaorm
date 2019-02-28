@@ -21,6 +21,14 @@ func TestDateFilter_Equals(t *testing.T) {
 	assert.Panics(t, func() { filter.Equals(0) })
 }
 
+func TestDateFilter_NotEquals(t *testing.T) {
+	filter := yaormfilter.NewDateFilter()
+	now := time.Now()
+	assert.Equal(t, filter, filter.NotEquals(now))
+	assert.Equal(t, filter, filter.NotEquals(&now))
+	assert.Panics(t, func() { filter.NotEquals(0) })
+}
+
 func TestDateFilter_Like(t *testing.T) {
 	filter := yaormfilter.NewDateFilter()
 	assert.Equal(t, filter, filter.Like(time.Now()))

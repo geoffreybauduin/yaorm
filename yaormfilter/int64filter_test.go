@@ -20,6 +20,14 @@ func TestInt64Filter_Equals(t *testing.T) {
 	assert.Panics(t, func() { filter.Equals("aazeae") })
 }
 
+func TestInt64Filter_NotEquals(t *testing.T) {
+	filter := yaormfilter.NewInt64Filter()
+	v := int64(12)
+	assert.Equal(t, filter, filter.NotEquals(v))
+	assert.Equal(t, filter, filter.NotEquals(&v))
+	assert.Panics(t, func() { filter.NotEquals("aazeae") })
+}
+
 func TestInt64Filter_Like(t *testing.T) {
 	filter := yaormfilter.NewInt64Filter()
 	assert.Equal(t, filter, filter.Like(int64(12)))

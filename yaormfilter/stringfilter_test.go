@@ -20,6 +20,14 @@ func TestStringFilter_Equals(t *testing.T) {
 	assert.Panics(t, func() { filter.Equals(0) })
 }
 
+func TestStringFilter_NotEquals(t *testing.T) {
+	filter := yaormfilter.NewStringFilter()
+	str := "bla"
+	assert.Equal(t, filter, filter.NotEquals(str))
+	assert.Equal(t, filter, filter.NotEquals(&str))
+	assert.Panics(t, func() { filter.NotEquals(0) })
+}
+
 func TestStringFilter_Like(t *testing.T) {
 	filter := yaormfilter.NewStringFilter()
 	str := "bla"

@@ -20,6 +20,14 @@ func TestBoolFilter_Equals(t *testing.T) {
 	assert.Panics(t, func() { filter.Equals("true") })
 }
 
+func TestBoolFilter_NotEquals(t *testing.T) {
+	filter := yaormfilter.NewBoolFilter()
+	v := true
+	assert.Equal(t, filter, filter.NotEquals(v))
+	assert.Equal(t, filter, filter.NotEquals(&v))
+	assert.Panics(t, func() { filter.NotEquals("true") })
+}
+
 func TestBoolFilter_Like(t *testing.T) {
 	filter := yaormfilter.NewBoolFilter()
 	assert.Equal(t, filter, filter.Like(true))

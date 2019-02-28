@@ -9,6 +9,7 @@ import (
 type ValueFilter interface {
 	Apply(statement squirrel.SelectBuilder, tableName, fieldName string) squirrel.SelectBuilder
 	Equals(v interface{}) ValueFilter
+	NotEquals(v interface{}) ValueFilter
 	Like(v interface{}) ValueFilter
 	Lt(v interface{}) ValueFilter
 	Lte(v interface{}) ValueFilter
@@ -21,29 +22,39 @@ type ValueFilter interface {
 }
 
 type valuefilterimpl struct {
-	equals_     interface{}
-	nil_        *bool
-	shouldEqual bool
-	like_       interface{}
-	shouldLike  bool
-	in_         []interface{}
-	shouldIn    bool
-	lt_         interface{}
-	shouldLt    bool
-	lte_        interface{}
-	shouldLte   bool
-	gt_         interface{}
-	shouldGt    bool
-	gte_        interface{}
-	shouldGte   bool
+	equals_        interface{}
+	nil_           *bool
+	shouldEqual    bool
+	like_          interface{}
+	shouldLike     bool
+	in_            []interface{}
+	shouldIn       bool
+	lt_            interface{}
+	shouldLt       bool
+	lte_           interface{}
+	shouldLte      bool
+	gt_            interface{}
+	shouldGt       bool
+	gte_           interface{}
+	shouldGte      bool
+	notEquals_     interface{}
+	shouldNotEqual bool
 }
 
 func (f valuefilterimpl) IsEquality() bool {
 	return f.shouldEqual
 }
 
+func (f valuefilterimpl) IsInequality() bool {
+	return f.shouldNotEqual
+}
+
 func (f valuefilterimpl) GetEquality() interface{} {
 	return f.equals_
+}
+
+func (f valuefilterimpl) GetInequality() interface{} {
+	return f.notEquals_
 }
 
 func (f *valuefilterimpl) nil(v bool) *valuefilterimpl {
@@ -54,6 +65,12 @@ func (f *valuefilterimpl) nil(v bool) *valuefilterimpl {
 func (f *valuefilterimpl) equals(e interface{}) *valuefilterimpl {
 	f.equals_ = e
 	f.shouldEqual = true
+	return f
+}
+
+func (f *valuefilterimpl) notEquals(e interface{}) *valuefilterimpl {
+	f.notEquals_ = e
+	f.shouldNotEqual = true
 	return f
 }
 
@@ -109,6 +126,11 @@ func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fie
 	if f.IsEquality() {
 		statement = statement.Where(
 			squirrel.Eq{computedField: f.GetEquality()},
+		)
+	}
+	if f.IsInequality() {
+		statement = statement.Where(
+			squirrel.NotEq{computedField: f.GetInequality()},
 		)
 	}
 	if f.shouldLike {

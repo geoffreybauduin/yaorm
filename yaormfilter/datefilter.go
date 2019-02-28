@@ -36,6 +36,12 @@ func (f *DateFilter) Equals(v interface{}) ValueFilter {
 	return f
 }
 
+// NotEquals applies an notEqual filter on Date
+func (f *DateFilter) NotEquals(v interface{}) ValueFilter {
+	f.notEquals(f.getValue(v))
+	return f
+}
+
 // Like is not applicable on Date
 func (f *DateFilter) Like(v interface{}) ValueFilter {
 	return f

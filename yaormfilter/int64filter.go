@@ -31,6 +31,12 @@ func (f *Int64Filter) Equals(v interface{}) ValueFilter {
 	return f
 }
 
+// NotEquals adds an notEqual filter
+func (f *Int64Filter) NotEquals(v interface{}) ValueFilter {
+	f.notEquals(f.getValue(v))
+	return f
+}
+
 // Like is not applicable on int64
 func (f *Int64Filter) Like(v interface{}) ValueFilter {
 	return f

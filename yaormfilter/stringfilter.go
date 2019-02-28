@@ -26,6 +26,17 @@ func (f *StringFilter) Equals(v interface{}) ValueFilter {
 	return f
 }
 
+// NotEquals adds an notEqual filter
+func (f *StringFilter) NotEquals(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	// make sure we have a string
+	if underlyingValue.Kind() != reflect.String {
+		panic("Value in StringFilter is not a string")
+	}
+	f.notEquals(underlyingValue.Interface())
+	return f
+}
+
 // Like adds a Like filter
 func (f *StringFilter) Like(v interface{}) ValueFilter {
 	underlyingValue := tools.GetNonPtrValue(v)
