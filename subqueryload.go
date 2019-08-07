@@ -59,6 +59,14 @@ func subqueryloadForModel(dbp DBProvider, model string, data map[interface{}][]r
 			return d, err
 		}
 		modelsSlice := reflect.ValueOf(models)
+
+		switch kind := modelsSlice.Kind(); kind {
+		case reflect.Array, reflect.Slice:
+			// only these kinds are allowed
+		default:
+			return nil, fmt.Errorf("a subquery returned a non-array and non-slice type '%s', which is not handled", kind)
+		}
+
 		for i := 0; i < modelsSlice.Len(); i++ {
 			m := modelsSlice.Index(i)
 			table, err := GetTableByModel(m.Interface().(Model))
