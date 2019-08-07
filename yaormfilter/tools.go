@@ -45,7 +45,7 @@ func NotEquals(v interface{}) ValueFilter {
 		return NewBoolFilter().NotEquals(v)
 	}
 	if v == nil {
-		return NewNilFilter().Nil(true)
+		return NewNilFilter().Nil(false)
 	}
 	panic(fmt.Errorf("Unknown type: %+v for value %+v in NotEquals filter", underlyingValue.Kind(), v))
 }
