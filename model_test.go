@@ -457,3 +457,21 @@ func TestGenericSelectOne_WithSubqueryloadSliceFilter(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, modelFound.(*testdata.Post).Metadata, 1)
 }
+
+func TestSubqueryloadWithInvalidTypeReturned(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	is := &testdata.InvalidSubquery{}
+	saveModel(t, dbp, is)
+	assert.NotEqual(t, 0, is.ID)
+	isb := &testdata.InvalidSubqueryB{InvalidSubqueryID: is.ID}
+	saveModel(t, dbp, isb)
+	_, err = yaorm.GenericSelectOne(dbp, testdata.NewInvalidSubqueryBFilter().InvalidSubquery(
+		testdata.NewInvalidSubqueryFilter().Subqueryload(),
+	))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "a subquery returned a non-array and non-slice type 'ptr', which is not handled")
+}
