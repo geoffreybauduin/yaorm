@@ -8,13 +8,47 @@ import (
 	"github.com/geoffreybauduin/yaorm/tools"
 )
 
-func buildSelect(dbp DBProvider, m Model) (squirrel.SelectBuilder, error) {
+type buildSelectColumns struct {
+	loadColumns     []string
+	dontLoadColumns []string
+}
+
+func (c *buildSelectColumns) reduce(columns []string) []string {
+	emptyLoad := len(c.loadColumns) == 0
+	emptyDontLoad := len(c.dontLoadColumns) == 0
+	if emptyLoad && emptyDontLoad {
+		return columns
+	}
+
+	// One cache for both load & dontLoad
+	cache := make(map[string]bool, len(c.loadColumns)+len(c.dontLoadColumns))
+	for _, col := range c.loadColumns {
+		cache[col] = true
+	}
+	for _, col := range c.dontLoadColumns {
+		cache[col] = false
+	}
+
+	// Do not reuse columns slice to avoid polluting its backend array
+	forceExclude := !emptyDontLoad && emptyLoad
+	var ok, exists bool
+	res := make([]string, 0, len(columns))
+	for _, f := range columns {
+		ok, exists = cache[f]
+		if ok || (!exists && forceExclude) {
+			res = append(res, f)
+		}
+	}
+	return res
+}
+
+func buildSelect(dbp DBProvider, m Model, sf buildSelectColumns) (squirrel.SelectBuilder, error) {
 	table, err := GetTableByModel(m)
 	if err != nil {
 		return squirrel.SelectBuilder{}, err
 	}
-	fields := table.Fields()
-	var f []string
+	fields := sf.reduce(table.Fields())
+	f := make([]string, 0, len(fields))
 	for _, field := range fields {
 		f = append(f, fmt.Sprintf(`%s.%s`, dbp.EscapeValue(table.Name()), dbp.EscapeValue(field)))
 	}

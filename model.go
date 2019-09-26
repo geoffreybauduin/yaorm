@@ -136,7 +136,10 @@ func GenericSelectOneFromModel(dbp DBProvider, m Model) error {
 // GenericSelectOneWithModel selects one row in the database providing the destination model directly
 // panics if filter or dbp is nil
 func GenericSelectOneWithModel(dbp DBProvider, filter yaormfilter.Filter, m Model) error {
-	statement, err := buildSelect(dbp, m)
+	statement, err := buildSelect(dbp, m, buildSelectColumns{
+		loadColumns:     filter.GetLoadColumns(),
+		dontLoadColumns: filter.GetDontLoadColumns(),
+	})
 	if err != nil {
 		return err
 	}
@@ -170,7 +173,10 @@ func GenericSelectAll(dbp DBProvider, filter yaormfilter.Filter) ([]Model, error
 	if err != nil {
 		return nil, err
 	}
-	statement, err := buildSelect(dbp, m)
+	statement, err := buildSelect(dbp, m, buildSelectColumns{
+		loadColumns:     filter.GetLoadColumns(),
+		dontLoadColumns: filter.GetDontLoadColumns(),
+	})
 	if err != nil {
 		return nil, err
 	}
