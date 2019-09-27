@@ -52,6 +52,16 @@ func TestGenericSelectOne(t *testing.T) {
 	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewCategoryFilter().Name(yaormfilter.Equals("category")))
 	assert.Nil(t, err)
 	assert.Equal(t, m.ID, modelFound.(*testdata.Category).ID)
+
+	filter := testdata.NewCategoryFilter().Name(yaormfilter.Equals("category"))
+	filter.LoadColumns("name", "created_at", "updated_at")
+	filter.DontLoadColumns("created_at")
+	modelFound, err = yaorm.GenericSelectOne(dbp, filter)
+	assert.NoError(t, err)
+	assert.Zero(t, modelFound.(*testdata.Category).ID) // not loaded
+	assert.Equal(t, "category", modelFound.(*testdata.Category).Name)
+	assert.True(t, modelFound.(*testdata.Category).CreatedAt.IsZero()) // not loaded
+	assert.False(t, modelFound.(*testdata.Category).UpdatedAt.IsZero())
 }
 
 func TestGenericInsert(t *testing.T) {

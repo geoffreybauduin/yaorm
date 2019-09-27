@@ -14,6 +14,10 @@ type Filter interface {
 	Offset(offset uint64) Filter
 	GetLimit() (bool, uint64)
 	GetOffset() (bool, uint64)
+	LoadColumns(columns ...string)
+	GetLoadColumns() []string
+	DontLoadColumns(columns ...string)
+	GetDontLoadColumns() []string
 }
 
 // OrderingWay is a custom type to have ordering
@@ -42,13 +46,15 @@ var RequestOptions = struct {
 
 // ModelFilter is the struct every filter should compose
 type ModelFilter struct {
-	subqueryload bool
-	options      []RequestOption
-	orderBy      []*OrderBy
-	shouldLimit  bool
-	limit        uint64
-	shouldOffset bool
-	offset       uint64
+	subqueryload    bool
+	options         []RequestOption
+	orderBy         []*OrderBy
+	shouldLimit     bool
+	limit           uint64
+	shouldOffset    bool
+	offset          uint64
+	loadColumns     []string
+	dontLoadColumns []string
 }
 
 type OrderBy struct {
@@ -128,4 +134,20 @@ func (mf *ModelFilter) GetLimit() (bool, uint64) {
 
 func (mf *ModelFilter) GetOffset() (bool, uint64) {
 	return mf.shouldOffset, mf.offset
+}
+
+func (mf *ModelFilter) LoadColumns(columns ...string) {
+	mf.loadColumns = append(mf.loadColumns, columns...)
+}
+
+func (mf *ModelFilter) GetLoadColumns() []string {
+	return mf.loadColumns[:len(mf.loadColumns):len(mf.loadColumns)]
+}
+
+func (mf *ModelFilter) DontLoadColumns(columns ...string) {
+	mf.dontLoadColumns = append(mf.dontLoadColumns, columns...)
+}
+
+func (mf *ModelFilter) GetDontLoadColumns() []string {
+	return mf.dontLoadColumns[:len(mf.dontLoadColumns):len(mf.dontLoadColumns)]
 }

@@ -102,7 +102,25 @@ type CategoryFilter struct {
 
 func GetCategory(dbp yaorm.DBProvider, id int64) (*Category, error) {
     category, err := yaorm.GenericSelectOne(dbp, &filter.CategoryFilter{FilterID: yaormfilter.Equals(id)})
-    return category, err
+    return category.(*Category), err
+}
+
+// GetCategoryLight only loads "id" and "name" columns (other fields
+// won't be initialized in returned *Category).
+func GetCategoryLight(dbp yaorm.DBProvider, id int64) (*Category, error) {
+    f := filter.CategoryFilter{FilterID: yaormfilter.Equals(id)}
+    f.LoadColumns("id", "name")
+    category, err := yaorm.GenericSelectOne(dbp, &f)
+    return category.(*Category), err
+}
+
+// GetCategoryNoDates does not load "created_at" and "updated_at"
+// columns (these fields won't be initialized in returned *Category).
+func GetCategoryNoDates(dbp yaorm.DBProvider, id int64) (*Category, error) {
+    f := filter.CategoryFilter{FilterID: yaormfilter.Equals(id)}
+    f.DontLoadColumns("created_at", "updated_at")
+    category, err := yaorm.GenericSelectOne(dbp, &f)
+    return category.(*Category), err
 }
 
 ```
