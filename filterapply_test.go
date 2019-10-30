@@ -166,3 +166,31 @@ func TestFilterApplier_LoadColumns(t *testing.T) {
 		assert.False(t, models[1].(*testdata.Category).UpdatedAt.IsZero())
 	}
 }
+
+func TestFilterApplier_Distinct(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+
+	assert.NoError(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.NoError(t, err)
+	post := &testdata.Post{}
+	saveModel(t, dbp, post)
+	postChild := &testdata.Post{ParentPostID: post.ID}
+	saveModel(t, dbp, postChild)
+	postChild2 := &testdata.Post{ParentPostID: post.ID}
+	saveModel(t, dbp, postChild2)
+
+	f := testdata.NewPostFilter()
+	f.ChildrenPosts(testdata.NewPostFilter().
+		ParentPostID(yaormfilter.NewInt64Filter().Equals(post.ID)))
+	models, err := yaorm.GenericSelectAll(dbp, f)
+	assert.NoError(t, err)
+	// We do not set the filter Distinct, so we should have one row per matching children
+	assert.Equal(t, 2, len(models))
+
+	f.Distinct()
+	models, err = yaorm.GenericSelectAll(dbp, f)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(models))
+}

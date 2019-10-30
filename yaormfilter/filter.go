@@ -38,9 +38,11 @@ type RequestOption string
 // RequestOptions represents the Enum of Request options
 var RequestOptions = struct {
 	SelectForUpdate RequestOption
+	SelectDistinct  RequestOption
 	LeftJoin        RequestOption
 }{
 	SelectForUpdate: "SelectForUpdate",
+	SelectDistinct:  "SelectDistinct",
 	LeftJoin:        "LeftJoin",
 }
 
@@ -103,7 +105,7 @@ func (mf *ModelFilter) GetSelectOptions() []RequestOption {
 	opts := []RequestOption{}
 	for _, opt := range mf.options {
 		switch opt {
-		case RequestOptions.SelectForUpdate:
+		case RequestOptions.SelectForUpdate, RequestOptions.SelectDistinct:
 			opts = append(opts, opt)
 		}
 	}

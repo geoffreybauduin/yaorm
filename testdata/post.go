@@ -40,6 +40,15 @@ func NewPostFilter() *PostFilter {
 	return &PostFilter{}
 }
 
+func (f *PostFilter) AddOption(opt yaormfilter.RequestOption) yaormfilter.Filter {
+	f.AddOption_(opt)
+	return f
+}
+
+func (f *PostFilter) Distinct() {
+	f.AddOption("SelectDistinct")
+}
+
 func (f *PostFilter) ID(v yaormfilter.ValueFilter) *PostFilter {
 	f.FilterID = v
 	return f

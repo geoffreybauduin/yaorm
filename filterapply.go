@@ -59,6 +59,8 @@ func apply(statement squirrel.SelectBuilder, f yaormfilter.Filter, dbp DBProvide
 			if dbp.CanSelectForUpdate() {
 				statement = statement.Suffix(fmt.Sprintf(`FOR UPDATE OF %s`, dbp.EscapeValue(applier.tableName)))
 			}
+		case yaormfilter.RequestOptions.SelectDistinct:
+			statement = statement.Distinct()
 		}
 	}
 	for _, orderBy := range f.GetOrderBy() {
