@@ -112,6 +112,10 @@ func (mf *ModelFilter) GetSelectOptions() []RequestOption {
 	return opts
 }
 
+func (mf *ModelFilter) Distinct() {
+	mf.AddOption_("SelectDistinct")
+}
+
 func (mf *ModelFilter) Limit(limit uint64) Filter {
 	panic(errors.NotImplementedf("Limit"))
 }
