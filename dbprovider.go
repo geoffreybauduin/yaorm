@@ -20,6 +20,7 @@ type DBProvider interface {
 	UUID() string
 	getDialect() gorp.Dialect
 	HasCapacity(capacity DatabaseCapacity) bool
+	RunInTransaction(func() error) error
 }
 
 type dbprovider struct {
@@ -108,4 +109,32 @@ func (dbp *dbprovider) HasCapacity(capacity DatabaseCapacity) bool {
 		return false
 	}
 	return databaseCapacities[system][capacity]
+}
+
+// RunInTraction will run the provided function inside a transaction.
+// if an error occurs, the transaction is automatically rolled back.
+// at the end of the transaction, the transaction is commit inside the
+// dbms
+func (dbp *dbprovider) RunInTransaction(fn func() error) error {
+	shouldRollback := true
+	errTx := dbp.Tx()
+	if errTx != nil {
+		return errTx
+	}
+	defer func() {
+		if !shouldRollback {
+			return
+		}
+		dbp.Rollback() //nolint:errcheck
+	}()
+	errFn := fn()
+	if errFn != nil {
+		return errFn
+	}
+	errCommit := dbp.Commit()
+	if errCommit != nil {
+		return errCommit
+	}
+	shouldRollback = false
+	return nil
 }

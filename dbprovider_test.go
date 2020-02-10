@@ -2,6 +2,7 @@ package yaorm_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/geoffreybauduin/yaorm"
@@ -81,4 +82,21 @@ func TestDbprovider_Rollback(t *testing.T) {
 	_, err = yaorm.GenericSelectOne(dbp, testdata.NewCategoryFilter().ID(yaormfilter.Equals(m.ID)))
 	assert.NotNil(t, err)
 	assert.True(t, errors.IsNotFound(err))
+}
+
+func TestDBProvider_RunInTransaction(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.NoError(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.NoError(t, err)
+	errTx := dbp.RunInTransaction(func() error {
+		return nil
+	})
+	assert.NoError(t, errTx)
+	errTx2 := dbp.RunInTransaction(func() error {
+		return fmt.Errorf("test error")
+	})
+	assert.Error(t, errTx2)
+	assert.Equal(t, "test error", errTx2.Error())
 }
