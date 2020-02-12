@@ -485,3 +485,58 @@ func TestSubqueryloadWithInvalidTypeReturned(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "a subquery returned a non-array and non-slice type 'ptr', which is not handled")
 }
+
+func TestGenericDelete(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.NoError(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.NoError(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category2)
+	rows, errDelete := yaorm.GenericDelete(category)
+	assert.NoError(t, errDelete)
+	assert.Equal(t, int64(1), rows)
+	rows, errDelete = yaorm.GenericDelete(category)
+	assert.NoError(t, errDelete)
+	assert.Equal(t, int64(0), rows)
+	notFound, err := yaorm.GenericSelectOne(dbp, testdata.NewCategoryFilter().ID(yaormfilter.Equals(category.ID)))
+	assert.Error(t, err)
+	assert.Nil(t, notFound)
+	assert.True(t, errors.IsNotFound(err))
+	found, err := yaorm.GenericSelectOne(dbp, testdata.NewCategoryFilter().ID(yaormfilter.Equals(category2.ID)))
+	assert.NoError(t, err)
+	assert.NotNil(t, found)
+}
+
+func TestGenericDelete_MultiplePrimaryKeys(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.NoError(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.NoError(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	post := &testdata.Post{Subject: "subject", CategoryID: category.ID}
+	saveModel(t, dbp, post)
+	tag := &testdata.Tag{Tag: "tag"}
+	saveModel(t, dbp, tag)
+	tag2 := &testdata.Tag{Tag: "tag2"}
+	saveModel(t, dbp, tag2)
+	posttag := &testdata.PostTag{TagID: tag.ID, PostID: post.ID}
+	saveModel(t, dbp, posttag)
+	posttag2 := &testdata.PostTag{TagID: tag2.ID, PostID: post.ID}
+	saveModel(t, dbp, posttag2)
+	rows, err := yaorm.GenericDelete(posttag)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), rows)
+	rows, err = yaorm.GenericDelete(posttag)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), rows)
+	listTags, err := yaorm.GenericSelectAll(dbp, testdata.NewPostTagFilter().PostID(yaormfilter.Equals(post.ID)))
+	assert.NoError(t, err)
+	assert.Len(t, listTags, 1)
+	assert.Equal(t, tag2.ID, listTags[0].(*testdata.PostTag).TagID)
+}

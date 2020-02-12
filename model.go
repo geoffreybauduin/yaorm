@@ -13,13 +13,22 @@ import (
 
 // Model is the interface every model should implement from
 type Model interface {
+	// GetDBP should return the DBProvider tied to this model
 	GetDBP() DBProvider
+	// SetDBP allows setting a DBProvider to the model, then returned by GetDBP
 	SetDBP(dbp DBProvider)
+	// Save allows saving the model
 	Save() error
+	// Load loads the model from database given the current struct
 	Load(dbp DBProvider) error
+	// Delete removes the model from database
 	Delete() error
+	// DBHookBeforeInsert is a hook called before performing a DB insertion
 	DBHookBeforeInsert() error
+	// DBHookBeforeUpdate is a hook called before performing a DB update
 	DBHookBeforeUpdate() error
+	// DBHookBeforeDelete is a hook called before performing a DB delete
+	DBHookBeforeDelete() error
 }
 
 // DatabaseModel is the struct every model should compose
@@ -27,31 +36,58 @@ type DatabaseModel struct {
 	dbp DBProvider `db:"-"`
 }
 
+// SetDBP allows setting a DBProvider to the model, then returned by GetDBP
 func (dm *DatabaseModel) SetDBP(dbp DBProvider) {
 	dm.dbp = dbp
 }
 
+// GetDBP should return the DBProvider tied to this model
 func (dm *DatabaseModel) GetDBP() DBProvider {
 	return dm.dbp
 }
 
+// Save allows saving the model
+// In order to be usable, this function needs to be redfined by each
+// composition of this structure
 func (dm *DatabaseModel) Save() error {
 	return errors.NotImplementedf("Save")
 }
 
+// Load loads the model from database given the current struct
+// In order to be usable, this function needs to be redfined by each
+// composition of this structure
 func (dm *DatabaseModel) Load(dbp DBProvider) error {
 	return errors.NotImplementedf("Load")
 }
 
+// Delete removes the model from database
+// In order to be usable, this function needs to be redfined by each
+// composition of this structure
 func (dm *DatabaseModel) Delete() error {
 	return errors.NotImplementedf("Delete")
 }
 
+// DBHookBeforeInsert is a hook called before performing a DB insertion
+// By default, this function does not do anything. If needed, you will have
+// to implement this function in your structure composing this one
+// in order to have your code hook executed
 func (dm *DatabaseModel) DBHookBeforeInsert() error {
 	return nil
 }
 
+// DBHookBeforeUpdate is a hook called before performing a DB update
+// By default, this function does not do anything. If needed, you will have
+// to implement this function in your structure composing this one
+// in order to have your code hook executed
 func (dm *DatabaseModel) DBHookBeforeUpdate() error {
+	return nil
+}
+
+// DBHookBeforeDelete is a hook called before performing a DB delete
+// By default, this function does not do anything. If needed, you will have
+// to implement this function in your structure composing this one
+// in order to have your code hook executed
+func (dm *DatabaseModel) DBHookBeforeDelete() error {
 	return nil
 }
 
@@ -471,4 +507,14 @@ func getFieldInModel(m Model, tag, equals string) (int, string) {
 		}
 	}
 	return -1, ""
+}
+
+// GenericDelete will delete the provided model from its database
+// Returns the number of rows deleted
+func GenericDelete(m Model) (int64, error) {
+	err := m.DBHookBeforeDelete()
+	if err != nil {
+		return 0, err
+	}
+	return m.GetDBP().DB().Delete(m)
 }
