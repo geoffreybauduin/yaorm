@@ -54,18 +54,33 @@ func (f *StringFilter) Nil(v bool) ValueFilter {
 	return f
 }
 
-// In adds a IN filter (not implemented)
+// In adds a IN filter
 func (f *StringFilter) In(values ...interface{}) ValueFilter {
 	interfaceValues := []interface{}{}
 	for _, v := range values {
 		underlyingValue := tools.GetNonPtrValue(v)
-		// make sure we have an int64
+		// make sure we have a string
 		if underlyingValue.Kind() != reflect.String {
 			panic("Value in StringFilter is not an string")
 		}
 		interfaceValues = append(interfaceValues, underlyingValue.Interface())
 	}
 	f.in(interfaceValues)
+	return f
+}
+
+// NotIn adds a NOT IN filter
+func (f *StringFilter) NotIn(values ...interface{}) ValueFilter {
+	interfaceValues := []interface{}{}
+	for _, v := range values {
+		underlyingValue := tools.GetNonPtrValue(v)
+		// make sure we have a string
+		if underlyingValue.Kind() != reflect.String {
+			panic("Value in StringFilter is not an string")
+		}
+		interfaceValues = append(interfaceValues, underlyingValue.Interface())
+	}
+	f.notIn(interfaceValues)
 	return f
 }
 

@@ -194,3 +194,20 @@ func TestFilterApplier_Distinct(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(models))
 }
+
+func TestFilterApplier_ApplyNotIn(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category2"}
+	saveModel(t, dbp, category2)
+
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().ID(yaormfilter.NotIn(category2.ID)))
+	assert.Nil(t, err)
+	assert.Len(t, models, 1)
+	assert.Equal(t, models[0].(*testdata.Category).ID, category.ID)
+}

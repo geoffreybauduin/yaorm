@@ -32,6 +32,14 @@ func TestIn(t *testing.T) {
 	assert.IsType(t, &yaormfilter.BoolFilter{}, yaormfilter.In([]bool{true, false}))
 }
 
+func TestNotIn(t *testing.T) {
+	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.NotIn("abcdef", "bcderzzer"))
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.NotIn(int64(12), int64(15)))
+	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.NotIn([]string{"abcdef", "bcderzzer"}))
+	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.NotIn([]int64{int64(12), int64(15)}))
+	assert.IsType(t, &yaormfilter.BoolFilter{}, yaormfilter.NotIn([]bool{true, false}))
+}
+
 func TestLike(t *testing.T) {
 	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.Like("abcdef%"))
 }

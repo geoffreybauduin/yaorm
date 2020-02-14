@@ -19,6 +19,7 @@ type ValueFilter interface {
 	IsEquality() bool
 	GetEquality() interface{}
 	In(v ...interface{}) ValueFilter
+	NotIn(v ...interface{}) ValueFilter
 }
 
 type valuefilterimpl struct {
@@ -29,6 +30,8 @@ type valuefilterimpl struct {
 	shouldLike     bool
 	in_            []interface{}
 	shouldIn       bool
+	notIn_         []interface{}
+	shouldNotIn    bool
 	lt_            interface{}
 	shouldLt       bool
 	lte_           interface{}
@@ -83,6 +86,12 @@ func (f *valuefilterimpl) like(e interface{}) *valuefilterimpl {
 func (f *valuefilterimpl) in(e []interface{}) *valuefilterimpl {
 	f.in_ = e
 	f.shouldIn = true
+	return f
+}
+
+func (f *valuefilterimpl) notIn(e []interface{}) *valuefilterimpl {
+	f.notIn_ = e
+	f.shouldNotIn = true
 	return f
 }
 
@@ -141,6 +150,11 @@ func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fie
 	if f.shouldIn {
 		statement = statement.Where(
 			squirrel.Eq{computedField: f.in_},
+		)
+	}
+	if f.shouldNotIn {
+		statement = statement.Where(
+			squirrel.NotEq{computedField: f.notIn_},
 		)
 	}
 	if f.shouldLt {
