@@ -59,6 +59,11 @@ func (f *DateFilter) In(values ...interface{}) ValueFilter {
 	return f
 }
 
+// NotIn adds a NOT IN filter (not implemented)
+func (f *DateFilter) NotIn(values ...interface{}) ValueFilter {
+	return f
+}
+
 // Lt adds a < filter
 func (f *DateFilter) Lt(v interface{}) ValueFilter {
 	f.lt(f.getValue(v))

@@ -52,18 +52,14 @@ func NotEquals(v interface{}) ValueFilter {
 
 // In returns the correct filter according to the value sent
 func In(values ...interface{}) ValueFilter {
-	var t reflect.Type
 	if tools.GetNonPtrValue(values).Len() == 0 {
 		return nil
 	}
-	for idx, v := range values {
+	t := tools.GetNonPtrValue(values[0]).Type()
+	for _, v := range values[1:] {
 		underlyingValue := tools.GetNonPtrValue(v)
-		if idx == 0 {
-			t = underlyingValue.Type()
-		} else {
-			if underlyingValue.Type() != t {
-				panic(fmt.Errorf("Inconsistent values sent, got types: %+v and %+v", t, underlyingValue.Type()))
-			}
+		if underlyingValue.Type() != t {
+			panic(fmt.Errorf("Inconsistent values sent, got types: %+v and %+v", t, underlyingValue.Type()))
 		}
 	}
 	switch t.Kind() {
@@ -152,4 +148,38 @@ func Gte(v interface{}) ValueFilter {
 		}
 	}
 	panic(fmt.Errorf("Unknown type: %+v for value %+v in Gte filter", underlyingValue.Kind(), v))
+}
+
+// NotIn returns the correct filter according to the value sent
+func NotIn(values ...interface{}) ValueFilter {
+	if tools.GetNonPtrValue(values).Len() == 0 {
+		return nil
+	}
+	t := tools.GetNonPtrValue(values[0]).Type()
+	for _, v := range values[1:] {
+		underlyingValue := tools.GetNonPtrValue(v)
+		if underlyingValue.Type() != t {
+			panic(fmt.Errorf("Inconsistent values sent, got types: %+v and %+v", t, underlyingValue.Type()))
+		}
+	}
+	switch t.Kind() {
+	case reflect.Int64:
+		return NewInt64Filter().NotIn(values...)
+	case reflect.String:
+		return NewStringFilter().NotIn(values...)
+	case reflect.Bool:
+		return NewBoolFilter().NotIn(values...)
+	case reflect.Slice:
+		// if we receive a slice, we want to go through all the slices received an concat them inside one
+		data := []interface{}{}
+		for _, v := range values {
+			underlyingValue := tools.GetNonPtrValue(v)
+			for i := 0; i < underlyingValue.Len(); i++ {
+				cell := tools.GetNonPtrValue(underlyingValue.Index(i).Interface())
+				data = append(data, cell.Interface())
+			}
+		}
+		return NotIn(data...)
+	}
+	panic(fmt.Errorf("Unknown type: %v inside In filter", t.Kind()))
 }

@@ -58,6 +58,16 @@ func (f *Int64Filter) In(values ...interface{}) ValueFilter {
 	return f
 }
 
+// NotIn adds a NOT IN filter
+func (f *Int64Filter) NotIn(values ...interface{}) ValueFilter {
+	interfaceValues := []interface{}{}
+	for _, v := range values {
+		interfaceValues = append(interfaceValues, f.getValue(v))
+	}
+	f.notIn(interfaceValues)
+	return f
+}
+
 // Lt adds a < filter
 func (f *Int64Filter) Lt(v interface{}) ValueFilter {
 	f.lt(f.getValue(v))

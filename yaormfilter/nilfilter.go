@@ -37,6 +37,11 @@ func (f *NilFilter) In(values ...interface{}) ValueFilter {
 	return f
 }
 
+// NotIn adds a NOT IN filter (not implemented)
+func (f *NilFilter) NotIn(values ...interface{}) ValueFilter {
+	return f
+}
+
 // Lt adds a < filter
 func (f *NilFilter) Lt(v interface{}) ValueFilter {
 	return f

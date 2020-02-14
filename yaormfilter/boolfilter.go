@@ -58,6 +58,16 @@ func (f *BoolFilter) In(values ...interface{}) ValueFilter {
 	return f
 }
 
+// NotIn adds a NOT IN filter
+func (f *BoolFilter) NotIn(values ...interface{}) ValueFilter {
+	interfaceValues := []interface{}{}
+	for _, v := range values {
+		interfaceValues = append(interfaceValues, f.getValue(v))
+	}
+	f.notIn(interfaceValues)
+	return f
+}
+
 // Lt is not applicable on bool
 func (f *BoolFilter) Lt(v interface{}) ValueFilter {
 	return f
