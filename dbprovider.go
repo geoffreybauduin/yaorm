@@ -34,7 +34,7 @@ type dbprovider struct {
 func NewDBProvider(ctx context.Context, name string) (DBProvider, error) {
 	dblock.RLock()
 	defer dblock.RUnlock()
-	dbp, err := zesty.NewDBProvider(name)
+	zestyDbp, err := zesty.NewDBProvider(name)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,8 @@ func NewDBProvider(ctx context.Context, name string) (DBProvider, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &dbprovider{DBProvider: dbp, name: name, ctx: ctx, uuid: uuid4.String()}, nil
+	dbp := &dbprovider{DBProvider: zestyDbp, name: name, ctx: ctx, uuid: uuid4.String()}
+	return dbp, dbp.getDb().DBSpecific().OnSessionCreated(dbp)
 }
 
 // DB returns a SQL Executor interface

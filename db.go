@@ -19,6 +19,7 @@ type DB interface {
 	zesty.DB
 	System() DMS
 	ExecutorHook() ExecutorHook
+	DBSpecific() DBSpecific
 }
 
 type db struct {
@@ -26,6 +27,7 @@ type db struct {
 	dbmap        *gorp.DbMap
 	system       DMS
 	executorHook ExecutorHook
+	dbSpecific   DBSpecific
 }
 
 func (d *db) System() DMS {
@@ -37,6 +39,10 @@ func (d *db) ExecutorHook() ExecutorHook {
 		return &DefaultExecutorHook{}
 	}
 	return reflect.New(tools.GetNonPtrValue(d.executorHook).Type()).Interface().(ExecutorHook)
+}
+
+func (d *db) DBSpecific() DBSpecific {
+	return d.dbSpecific
 }
 
 var (
@@ -57,6 +63,7 @@ type DatabaseConfiguration struct {
 	Dialect gorp.Dialect
 	// ExecutorHook is a configurable hook to add logs, for example, to your sql requests
 	ExecutorHook ExecutorHook
+	DBSpecific   DBSpecific
 }
 
 // GetDB returns a database object from its name
@@ -99,10 +106,15 @@ func RegisterDB(config *DatabaseConfiguration) error {
 		return err
 	}
 
+	if config.DBSpecific == nil {
+		config.DBSpecific = noopSpecific{}
+	}
+
 	registry[config.Name] = &db{
 		DB:           dbHandler,
 		system:       config.System,
 		executorHook: config.ExecutorHook,
+		dbSpecific:   config.DBSpecific,
 	}
 
 	return nil

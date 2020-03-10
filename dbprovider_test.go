@@ -3,6 +3,8 @@ package yaorm_test
 import (
 	"context"
 	"fmt"
+	"os"
+	"reflect"
 	"testing"
 
 	"github.com/geoffreybauduin/yaorm"
@@ -99,4 +101,55 @@ func TestDBProvider_RunInTransaction(t *testing.T) {
 	})
 	assert.Error(t, errTx2)
 	assert.Equal(t, "test error", errTx2.Error())
+}
+
+func TestDBProvider_Postgres_OnSessionCreated(t *testing.T) {
+	if os.Getenv("DB") != "postgres" {
+		return
+	}
+	exec := &pgSpecificExecutor{
+		queries: make([]logParams, 0),
+	}
+	killDb, err := testdata.SetupPostgres("test", yaorm.PostgresSpecific{IntervalStyle: "iso_8601"}, exec)
+	defer killDb()
+	assert.NoError(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.NoError(t, err)
+	assert.Len(t, exec.queries, 1)
+	assert.True(t, reflect.DeepEqual(exec.queries, []logParams{
+		{
+			query: "SET intervalstyle = ?",
+			args:  []interface{}{"iso_8601"},
+		},
+	}))
+	_, err = dbp.DB().Exec("SELECT 1")
+	assert.NoError(t, err)
+	assert.Len(t, exec.queries, 2)
+	assert.True(t, reflect.DeepEqual(exec.queries, []logParams{
+		{
+			query: "SET intervalstyle = ?",
+			args:  []interface{}{"iso_8601"},
+		},
+		{
+			query: "SELECT 1",
+			args:  nil,
+		},
+	}))
+}
+
+type pgSpecificExecutor struct {
+	yaorm.DefaultExecutorHook
+	queries []logParams
+}
+
+type logParams struct {
+	query string
+	args  []interface{}
+}
+
+func (exec *pgSpecificExecutor) BeforeExec(ctx context.Context, query string, args ...interface{}) {
+	exec.queries = append(exec.queries, logParams{
+		query: query,
+		args:  args,
+	})
 }
