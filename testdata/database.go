@@ -25,15 +25,15 @@ var (
 func SetupTestDatabase(name string) (func(), error) {
 	switch os.Getenv("DB") {
 	case "postgres":
-		return setupPostgres(name)
+		return SetupPostgres(name, nil, &LoggingExecutor{})
 	case "mysql":
-		return setupMysql(name)
+		return setupMysql(name, nil)
 	default:
-		return setupSqlite(name)
+		return setupSqlite(name, nil)
 	}
 }
 
-func setupSqlite(name string) (func(), error) {
+func setupSqlite(name string, spec yaorm.DBSpecific) (func(), error) {
 	tmpFile := fmt.Sprintf("/tmp/yaorm_%s_%d.sqlite", name, rand.Int())
 	err := yaorm.RegisterDB(&yaorm.DatabaseConfiguration{
 		Name:             name,
@@ -41,6 +41,7 @@ func setupSqlite(name string) (func(), error) {
 		System:           yaorm.DatabaseSqlite3,
 		AutoCreateTables: true,
 		ExecutorHook:     &LoggingExecutor{},
+		DBSpecific:       spec,
 	})
 	if err != nil {
 		return nil, err
@@ -54,13 +55,14 @@ func setupSqlite(name string) (func(), error) {
 	}, nil
 }
 
-func setupPostgres(name string) (func(), error) {
+func SetupPostgres(name string, spec yaorm.DBSpecific, executor yaorm.ExecutorHook) (func(), error) {
 	err := yaorm.RegisterDB(&yaorm.DatabaseConfiguration{
 		Name:             name,
 		DSN:              os.Getenv("DSN"),
 		System:           yaorm.DatabasePostgreSQL,
 		AutoCreateTables: true,
-		ExecutorHook:     &LoggingExecutor{},
+		ExecutorHook:     executor,
+		DBSpecific:       spec,
 	})
 	if err != nil {
 		return nil, err
@@ -84,7 +86,7 @@ func setupPostgres(name string) (func(), error) {
 	}, nil
 }
 
-func setupMysql(name string) (func(), error) {
+func setupMysql(name string, spec yaorm.DBSpecific) (func(), error) {
 	err := yaorm.RegisterDB(&yaorm.DatabaseConfiguration{
 		Name:             name,
 		DSN:              os.Getenv("DSN"),
@@ -92,6 +94,7 @@ func setupMysql(name string) (func(), error) {
 		AutoCreateTables: true,
 		Dialect:          gorp.MySQLDialect{Engine: "InnoDB", Encoding: "UTF8"},
 		ExecutorHook:     &LoggingExecutor{},
+		DBSpecific:       spec,
 	})
 	if err != nil {
 		return nil, err
