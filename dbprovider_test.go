@@ -118,8 +118,8 @@ func TestDBProvider_Postgres_OnSessionCreated(t *testing.T) {
 	assert.Len(t, exec.queries, 1)
 	assert.True(t, reflect.DeepEqual(exec.queries, []logParams{
 		{
-			query: "SET intervalstyle = ?",
-			args:  []interface{}{"iso_8601"},
+			query: "SET intervalstyle = 'iso_8601'",
+			args:  []interface{}{},
 		},
 	}))
 	_, err = dbp.DB().Exec("SELECT 1")
@@ -127,8 +127,8 @@ func TestDBProvider_Postgres_OnSessionCreated(t *testing.T) {
 	assert.Len(t, exec.queries, 2)
 	assert.True(t, reflect.DeepEqual(exec.queries, []logParams{
 		{
-			query: "SET intervalstyle = ?",
-			args:  []interface{}{"iso_8601"},
+			query: "SET intervalstyle = 'iso_8601'",
+			args:  []interface{}{},
 		},
 		{
 			query: "SELECT 1",

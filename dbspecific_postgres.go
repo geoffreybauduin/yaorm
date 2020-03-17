@@ -1,5 +1,7 @@
 package yaorm
 
+import "fmt"
+
 // PostgresSpecific holds specific configurations used by Postgres
 type PostgresSpecific struct {
 	// IntervaStyle holds the style of output of the interval
@@ -12,7 +14,8 @@ type PostgresSpecific struct {
 // - IntervalStyle
 func (p PostgresSpecific) OnSessionCreated(dbp DBProvider) error {
 	if p.IntervalStyle != "" {
-		if _, err := dbp.DB().Exec("SET intervalstyle = ?", p.IntervalStyle); err != nil {
+		// Exec does not take the "?" or "$1" placeholdes into account in such queries
+		if _, err := dbp.DB().Exec(fmt.Sprintf("SET intervalstyle = '%s'", p.IntervalStyle)); err != nil {
 			return err
 		}
 	}
