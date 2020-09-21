@@ -90,6 +90,6 @@ func (f *BoolFilter) Gte(v interface{}) ValueFilter {
 
 // Raw performs a Raw filter
 func (f *BoolFilter) Raw(s RawFilterFunc) ValueFilter {
-	f.raw_ = s
+	f.raw(s)
 	return f
 }

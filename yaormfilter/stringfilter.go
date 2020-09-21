@@ -106,6 +106,6 @@ func (f *StringFilter) Gte(v interface{}) ValueFilter {
 
 // Raw performs a Raw filter
 func (f *StringFilter) Raw(s RawFilterFunc) ValueFilter {
-	f.raw_ = s
+	f.raw(s)
 	return f
 }

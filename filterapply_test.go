@@ -224,7 +224,7 @@ func TestFilterApplier_ApplyRaw(t *testing.T) {
 	category2 := &testdata.Category{Name: "category2"}
 	saveModel(t, dbp, category2)
 
-	models, err := yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().ID(yaormfilter.Raw(func(field string) string {
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewCategoryFilter().ID(yaormfilter.Raw(func(field string) interface{} {
 		return fmt.Sprintf("%s >= %d AND %s < %d", field, category.ID, field, category2.ID)
 	})))
 	assert.Nil(t, err)
@@ -243,7 +243,7 @@ func TestFilterApplier_ApplyRaw_EscapedFields(t *testing.T) {
 	category2 := &testdata.TwoI{Name: "category2"}
 	saveModel(t, dbp, category2)
 
-	models, err := yaorm.GenericSelectAll(dbp, testdata.NewTwoIFilter().ID(yaormfilter.Raw(func(field string) string {
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewTwoIFilter().ID(yaormfilter.Raw(func(field string) interface{} {
 		return fmt.Sprintf("%s >= %d AND %s < %d", field, category.ID, field, category2.ID)
 	})))
 	assert.Nil(t, err)

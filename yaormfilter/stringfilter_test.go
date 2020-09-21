@@ -47,5 +47,5 @@ func TestStringFilter_In(t *testing.T) {
 
 func TestStringFilter_Raw(t *testing.T) {
 	filter := yaormfilter.NewStringFilter()
-	assert.Equal(t, filter, filter.Raw(func(s string) string { return s }))
+	assert.Equal(t, filter, filter.Raw(func(s string) interface{} { return s }))
 }

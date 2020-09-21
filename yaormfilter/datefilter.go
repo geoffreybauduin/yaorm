@@ -90,6 +90,6 @@ func (f *DateFilter) Gte(v interface{}) ValueFilter {
 
 // Raw performs a Raw filter
 func (f *DateFilter) Raw(s RawFilterFunc) ValueFilter {
-	f.raw_ = s
+	f.raw(s)
 	return f
 }
