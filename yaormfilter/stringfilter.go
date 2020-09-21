@@ -103,3 +103,9 @@ func (f *StringFilter) Gt(v interface{}) ValueFilter {
 func (f *StringFilter) Gte(v interface{}) ValueFilter {
 	return f
 }
+
+// Raw performs a Raw filter
+func (f *StringFilter) Raw(s RawFilterFunc) ValueFilter {
+	f.raw_ = s
+	return f
+}

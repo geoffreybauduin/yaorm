@@ -87,3 +87,9 @@ func (f *DateFilter) Gte(v interface{}) ValueFilter {
 	f.gte(f.getValue(v))
 	return f
 }
+
+// Raw performs a Raw filter
+func (f *DateFilter) Raw(s RawFilterFunc) ValueFilter {
+	f.raw_ = s
+	return f
+}

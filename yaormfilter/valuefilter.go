@@ -6,6 +6,8 @@ import (
 	"github.com/geoffreybauduin/yaorm/_vendor/github.com/lann/squirrel"
 )
 
+type RawFilterFunc func(string) string
+
 type ValueFilter interface {
 	Apply(statement squirrel.SelectBuilder, tableName, fieldName string) squirrel.SelectBuilder
 	Equals(v interface{}) ValueFilter
@@ -20,6 +22,7 @@ type ValueFilter interface {
 	GetEquality() interface{}
 	In(v ...interface{}) ValueFilter
 	NotIn(v ...interface{}) ValueFilter
+	Raw(fn RawFilterFunc) ValueFilter
 }
 
 type valuefilterimpl struct {
@@ -42,6 +45,7 @@ type valuefilterimpl struct {
 	shouldGte      bool
 	notEquals_     interface{}
 	shouldNotEqual bool
+	raw_           RawFilterFunc
 }
 
 func (f valuefilterimpl) IsEquality() bool {
@@ -175,6 +179,11 @@ func (f *valuefilterimpl) Apply(statement squirrel.SelectBuilder, tableName, fie
 	if f.shouldGte {
 		statement = statement.Where(
 			squirrel.GtOrEq{computedField: f.gte_},
+		)
+	}
+	if f.raw_ != nil {
+		statement = statement.Where(
+			f.raw_(computedField),
 		)
 	}
 	return statement

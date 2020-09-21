@@ -91,3 +91,9 @@ func (f *Int64Filter) Gte(v interface{}) ValueFilter {
 	f.gte(f.getValue(v))
 	return f
 }
+
+// Raw performs a Raw filter
+func (f *Int64Filter) Raw(s RawFilterFunc) ValueFilter {
+	f.raw_ = s
+	return f
+}
