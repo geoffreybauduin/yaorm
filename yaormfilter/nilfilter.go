@@ -61,3 +61,9 @@ func (f *NilFilter) Gt(v interface{}) ValueFilter {
 func (f *NilFilter) Gte(v interface{}) ValueFilter {
 	return f
 }
+
+// Raw performs a Raw filter
+func (f *NilFilter) Raw(s RawFilterFunc) ValueFilter {
+	f.raw(s)
+	return f
+}

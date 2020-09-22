@@ -183,3 +183,8 @@ func NotIn(values ...interface{}) ValueFilter {
 	}
 	panic(fmt.Errorf("Unknown type: %v inside In filter", t.Kind()))
 }
+
+// Raw returns the correct filter according the value sent
+func Raw(v RawFilterFunc) ValueFilter {
+	return NewStringFilter().Raw(v)
+}

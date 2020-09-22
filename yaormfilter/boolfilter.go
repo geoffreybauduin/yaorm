@@ -87,3 +87,9 @@ func (f *BoolFilter) Gt(v interface{}) ValueFilter {
 func (f *BoolFilter) Gte(v interface{}) ValueFilter {
 	return f
 }
+
+// Raw performs a Raw filter
+func (f *BoolFilter) Raw(s RawFilterFunc) ValueFilter {
+	f.raw(s)
+	return f
+}
