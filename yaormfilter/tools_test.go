@@ -16,6 +16,15 @@ func TestEquals(t *testing.T) {
 	assert.IsType(t, &yaormfilter.BoolFilter{}, yaormfilter.Equals(false))
 }
 
+func TestEquality(t *testing.T) {
+	f := yaormfilter.Equals("abdef")
+	assert.True(t, f.IsEquality())
+	assert.Equal(t, "abdef", f.GetEquality())
+
+	f = yaormfilter.NotEquals("bdef")
+	assert.False(t, f.IsEquality())
+}
+
 func TestNotEquals(t *testing.T) {
 	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.NotEquals("abcdef"))
 	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.NotEquals(int64(12)))
