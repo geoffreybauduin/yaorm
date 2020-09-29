@@ -65,7 +65,7 @@ func (f *valuefilterimpl) notEquals(e interface{}) *valuefilterimpl {
 
 func (f *valuefilterimpl) like(e interface{}) *valuefilterimpl {
 	return f.raw(func(field string) interface{} {
-		return fmt.Sprintf("%s LIKE %s", field, e)
+		return squirrel.Expr(fmt.Sprintf("%s LIKE ?", field), e)
 	})
 }
 
