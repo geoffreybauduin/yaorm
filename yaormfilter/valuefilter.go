@@ -21,10 +21,22 @@ type ValueFilter interface {
 	In(v ...interface{}) ValueFilter
 	NotIn(v ...interface{}) ValueFilter
 	Raw(fn RawFilterFunc) ValueFilter
+	IsEquality() bool
+	GetEquality() interface{}
 }
 
 type valuefilterimpl struct {
-	filterFn RawFilterFunc
+	filterFn    RawFilterFunc
+	shouldEqual bool
+	equals_     interface{}
+}
+
+func (f valuefilterimpl) IsEquality() bool {
+	return f.shouldEqual
+}
+
+func (f valuefilterimpl) GetEquality() interface{} {
+	return f.equals_
 }
 
 func (f *valuefilterimpl) nil(v bool) *valuefilterimpl {
@@ -38,6 +50,8 @@ func (f *valuefilterimpl) nil(v bool) *valuefilterimpl {
 }
 
 func (f *valuefilterimpl) equals(e interface{}) *valuefilterimpl {
+	f.shouldEqual = true
+	f.equals_ = e
 	return f.raw(func(field string) interface{} {
 		return squirrel.Eq{field: e}
 	})
@@ -51,7 +65,7 @@ func (f *valuefilterimpl) notEquals(e interface{}) *valuefilterimpl {
 
 func (f *valuefilterimpl) like(e interface{}) *valuefilterimpl {
 	return f.raw(func(field string) interface{} {
-		return fmt.Sprintf("%s LIKE %s", field, e)
+		return squirrel.Expr(fmt.Sprintf("%s LIKE ?", field), e)
 	})
 }
 

@@ -250,3 +250,19 @@ func TestFilterApplier_ApplyRaw_EscapedFields(t *testing.T) {
 	assert.Len(t, models, 1)
 	assert.Equal(t, models[0].(*testdata.TwoI).ID, category.ID)
 }
+
+func TestFilterApply_Like(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.TwoI{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.TwoI{Name: "category2"}
+	saveModel(t, dbp, category2)
+
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewTwoIFilter().Name(yaormfilter.Like("category%")))
+	assert.Nil(t, err)
+	assert.Len(t, models, 2)
+}
