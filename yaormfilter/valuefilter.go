@@ -70,7 +70,9 @@ func (f *valuefilterimpl) like(e interface{}) *valuefilterimpl {
 }
 
 func (f *valuefilterimpl) in(e []interface{}) *valuefilterimpl {
-	return f.equals(e)
+	return f.raw(func(field string) interface{} {
+		return squirrel.Eq{field: e}
+	})
 }
 
 func (f *valuefilterimpl) notIn(e []interface{}) *valuefilterimpl {

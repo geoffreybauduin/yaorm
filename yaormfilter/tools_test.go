@@ -23,6 +23,9 @@ func TestEquality(t *testing.T) {
 
 	f = yaormfilter.NotEquals("bdef")
 	assert.False(t, f.IsEquality())
+
+	f = yaormfilter.In([]string{"abc", "bdef"})
+	assert.False(t, f.IsEquality())
 }
 
 func TestNotEquals(t *testing.T) {
