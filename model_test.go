@@ -210,6 +210,67 @@ func TestGenericSelectOne_WithSubqueryload(t *testing.T) {
 	assert.Equal(t, category2.ID, modelFound.(*testdata.Post).Category.ID)
 }
 
+func TestGenericSelectOne_WithSubqueryloadLeftJoin(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.Category{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.Category{Name: "category2"}
+	saveModel(t, dbp, category2)
+	post := &testdata.Post{Subject: "subject", CategoryID: category2.ID}
+	saveModel(t, dbp, post)
+	post2 := &testdata.Post{Subject: "subject", CategoryID: category2.ID, ParentPostID: post.ID}
+	saveModel(t, dbp, post2)
+
+	// Join on a post with parent
+	modelFound, err := yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().ChildrenPosts(
+		testdata.NewPostFilter().ID(yaormfilter.Gte(int64(1))).Subqueryload(),
+	).ID(
+		yaormfilter.Equals(post.ID),
+	))
+	if assert.Nil(t, err) {
+		assert.Equal(t, post.ID, modelFound.(*testdata.Post).ID)
+		assert.Len(t, modelFound.(*testdata.Post).ChildrenPost, 1)
+		assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ChildrenPost[0].ID)
+	}
+
+	// Join on a post without parent
+	modelFound, err = yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().ChildrenPosts(
+		testdata.NewPostFilter().ID(yaormfilter.Gte(int64(1))).Subqueryload(),
+	).ID(
+		yaormfilter.Equals(post2.ID),
+	))
+	if assert.NotNil(t, err) {
+		assert.True(t, errors.IsNotFound(err))
+	}
+
+	// Left join on a post with parent
+	modelFound, err = yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().ChildrenPosts(
+		testdata.NewPostFilter().Subqueryload().AddOption(yaormfilter.RequestOptions.LeftJoin),
+	).ID(
+		yaormfilter.Equals(post.ID),
+	))
+	if assert.Nil(t, err) {
+		assert.Equal(t, post.ID, modelFound.(*testdata.Post).ID)
+		assert.Len(t, modelFound.(*testdata.Post).ChildrenPost, 1)
+		assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ChildrenPost[0].ID)
+	}
+
+	// Left join on a post without parent
+	modelFound, err = yaorm.GenericSelectOne(dbp, testdata.NewPostFilter().ChildrenPosts(
+		testdata.NewPostFilter().Subqueryload().AddOption(yaormfilter.RequestOptions.LeftJoin),
+	).ID(
+		yaormfilter.Equals(post2.ID),
+	))
+	if assert.Nil(t, err) {
+		assert.Equal(t, post2.ID, modelFound.(*testdata.Post).ID)
+		assert.Len(t, modelFound.(*testdata.Post).ChildrenPost, 0)
+	}
+}
+
 func TestGenericSelectAll_WithJoinFilters(t *testing.T) {
 	killDb, err := testdata.SetupTestDatabase("test")
 	defer killDb()
