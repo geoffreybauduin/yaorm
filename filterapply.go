@@ -26,6 +26,7 @@ type filterFieldApplier struct {
 	isJoining   bool
 	leftJoin    bool
 	dbp         DBProvider
+	filter      yaormfilter.Filter
 }
 
 func getTableNameFromFilter(f yaormfilter.Filter) string {
@@ -95,6 +96,7 @@ func (a *filterApplier) Apply() {
 			statement: a.statement,
 			tableName: a.tableName,
 			dbp:       a.dbp,
+			filter:    a.filter,
 		}
 		applier.Apply()
 		a.statement = applier.statement
@@ -126,10 +128,21 @@ func (a *filterFieldApplier) setupFromTag() {
 	a.dbFieldName = a.tagData[0]
 	a.isJoining = false
 	a.leftJoin = false
+
+	// Set up LEFT JOIN from tag
 	if len(a.tagData) == 4 && strings.Contains(a.tagData[1], "join") {
 		a.isJoining = true
 		if strings.Contains(a.tagData[1], "left") {
 			a.leftJoin = true
+		}
+	}
+
+	// Set up LEFT JOIN from filter option
+	if !a.leftJoin {
+		for _, option := range a.filter.GetSelectOptions() {
+			if option == yaormfilter.RequestOptions.LeftJoin {
+				a.leftJoin = true
+			}
 		}
 	}
 }

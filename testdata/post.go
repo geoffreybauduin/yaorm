@@ -88,3 +88,9 @@ func (f *PostFilter) Metadata(metadata ...yaormfilter.Filter) *PostFilter {
 	}
 	return f
 }
+
+// AddOption adds an option on the current query
+func (f *PostFilter) AddOption(opt yaormfilter.RequestOption) yaormfilter.Filter {
+	f.AddOption_(opt)
+	return f
+}
