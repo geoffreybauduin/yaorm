@@ -34,6 +34,12 @@ func TestStringFilter_Like(t *testing.T) {
 	assert.Equal(t, filter, filter.Like(str))
 }
 
+func TestStringFilter_ILike(t *testing.T) {
+	filter := yaormfilter.NewStringFilter()
+	str := "bla"
+	assert.Equal(t, filter, filter.ILike(str))
+}
+
 func TestStringFilter_Nil(t *testing.T) {
 	filter := yaormfilter.NewStringFilter()
 	assert.Equal(t, filter, filter.Nil(true))

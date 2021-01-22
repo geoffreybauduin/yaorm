@@ -13,6 +13,7 @@ type ValueFilter interface {
 	Equals(v interface{}) ValueFilter
 	NotEquals(v interface{}) ValueFilter
 	Like(v interface{}) ValueFilter
+	ILike(v interface{}) ValueFilter
 	Lt(v interface{}) ValueFilter
 	Lte(v interface{}) ValueFilter
 	Gt(v interface{}) ValueFilter
@@ -66,6 +67,12 @@ func (f *valuefilterimpl) notEquals(e interface{}) *valuefilterimpl {
 func (f *valuefilterimpl) like(e interface{}) *valuefilterimpl {
 	return f.raw(func(field string) interface{} {
 		return squirrel.Expr(fmt.Sprintf("%s LIKE ?", field), e)
+	})
+}
+
+func (f *valuefilterimpl) ilike(e interface{}) *valuefilterimpl {
+	return f.raw(func(field string) interface{} {
+		return squirrel.Expr(fmt.Sprintf("%s ILIKE ?", field), e)
 	})
 }
 
