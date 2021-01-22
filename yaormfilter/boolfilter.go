@@ -42,6 +42,11 @@ func (f *BoolFilter) Like(v interface{}) ValueFilter {
 	return f
 }
 
+// ILike is not applicable on bool
+func (f *BoolFilter) ILike(v interface{}) ValueFilter {
+	return f
+}
+
 // Nil adds a nil filter
 func (f *BoolFilter) Nil(v bool) ValueFilter {
 	f.nil(v)

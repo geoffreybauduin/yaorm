@@ -47,6 +47,11 @@ func (f *DateFilter) Like(v interface{}) ValueFilter {
 	return f
 }
 
+// ILike is not applicable on Date
+func (f *DateFilter) ILike(v interface{}) ValueFilter {
+	return f
+}
+
 // Nil applies a nil filter on Date
 func (f *DateFilter) Nil(v bool) ValueFilter {
 	f.nil(v)

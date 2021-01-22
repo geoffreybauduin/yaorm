@@ -266,3 +266,19 @@ func TestFilterApply_Like(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, models, 2)
 }
+
+func TestFilterApply_ILike(t *testing.T) {
+	killDb, err := testdata.SetupTestDatabase("test")
+	defer killDb()
+	assert.Nil(t, err)
+	dbp, err := yaorm.NewDBProvider(context.TODO(), "test")
+	assert.Nil(t, err)
+	category := &testdata.TwoI{Name: "category"}
+	saveModel(t, dbp, category)
+	category2 := &testdata.TwoI{Name: "categoryY"}
+	saveModel(t, dbp, category2)
+
+	models, err := yaorm.GenericSelectAll(dbp, testdata.NewTwoIFilter().Name(yaormfilter.ILike("categor%")))
+	assert.Nil(t, err)
+	assert.Len(t, models, 2)
+}

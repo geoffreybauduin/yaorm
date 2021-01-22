@@ -56,6 +56,10 @@ func TestLike(t *testing.T) {
 	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.Like("abcdef%"))
 }
 
+func TestILike(t *testing.T) {
+	assert.IsType(t, &yaormfilter.StringFilter{}, yaormfilter.ILike("abcdef%"))
+}
+
 func TestLt(t *testing.T) {
 	assert.IsType(t, &yaormfilter.Int64Filter{}, yaormfilter.Lt(int64(12)))
 	assert.IsType(t, &yaormfilter.DateFilter{}, yaormfilter.Lt(time.Now()))

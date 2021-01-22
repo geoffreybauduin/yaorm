@@ -94,6 +94,16 @@ func Like(v interface{}) ValueFilter {
 	panic(fmt.Errorf("Unknown type: %+v for value %+v in Like filter", underlyingValue.Kind(), v))
 }
 
+// ILike returns the correct filter according to the value sent
+func ILike(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	switch underlyingValue.Kind() {
+	case reflect.String:
+		return NewStringFilter().ILike(v)
+	}
+	panic(fmt.Errorf("Unknown type: %+v for value %+v in ILike filter", underlyingValue.Kind(), v))
+}
+
 // Lt returns the correct filter according the value sent
 func Lt(v interface{}) ValueFilter {
 	underlyingValue := tools.GetNonPtrValue(v)
