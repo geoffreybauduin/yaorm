@@ -26,6 +26,7 @@ type DatabaseConfig struct {
 	MaxIdleConns     int
 	AutoCreateTables bool
 	ConnMaxLifetime  time.Duration
+	ConnMaxIdleTime  time.Duration
 }
 
 // RegisterDatabase creates a gorp map with tables and tc and
@@ -47,6 +48,7 @@ func RegisterDatabase(db *DatabaseConfig, tc gorp.TypeConverter, dialect gorp.Di
 	}
 	dbConn.SetMaxIdleConns(db.MaxIdleConns)
 	dbConn.SetConnMaxLifetime(db.ConnMaxLifetime)
+	dbConn.SetConnMaxIdleTime(db.ConnMaxIdleTime)
 
 	// Select the proper dialect used by gorp.
 	if dialect == nil {
