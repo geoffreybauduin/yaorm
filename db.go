@@ -58,6 +58,7 @@ type DatabaseConfiguration struct {
 	MaxOpenConns     int
 	MaxIdleConns     int
 	ConnMaxLifetime  time.Duration
+	ConnMaxIdleTime  time.Duration
 	AutoCreateTables bool
 	// Dialect database dialect, leave empty for automatic guessing
 	Dialect gorp.Dialect
@@ -92,6 +93,7 @@ func RegisterDB(config *DatabaseConfiguration) error {
 		MaxIdleConns:     config.MaxIdleConns,
 		MaxOpenConns:     config.MaxOpenConns,
 		ConnMaxLifetime:  config.ConnMaxLifetime,
+		ConnMaxIdleTime:  config.ConnMaxIdleTime,
 	}
 
 	// Register database.
