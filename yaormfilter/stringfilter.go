@@ -48,6 +48,17 @@ func (f *StringFilter) Like(v interface{}) ValueFilter {
 	return f
 }
 
+// ILike adds a Like filter
+func (f *StringFilter) ILike(v interface{}) ValueFilter {
+	underlyingValue := tools.GetNonPtrValue(v)
+	// make sure we have a string
+	if underlyingValue.Kind() != reflect.String {
+		panic("Value in StringFilter is not a string")
+	}
+	f.ilike(underlyingValue.Interface())
+	return f
+}
+
 // Nil adds a nil filter
 func (f *StringFilter) Nil(v bool) ValueFilter {
 	f.nil(v)

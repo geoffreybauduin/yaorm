@@ -33,6 +33,11 @@ func TestBoolFilter_Like(t *testing.T) {
 	assert.Equal(t, filter, filter.Like(true))
 }
 
+func TestBoolFilter_ILike(t *testing.T) {
+	filter := yaormfilter.NewBoolFilter()
+	assert.Equal(t, filter, filter.ILike(true))
+}
+
 func TestBoolFilter_Nil(t *testing.T) {
 	filter := yaormfilter.NewBoolFilter()
 	assert.Equal(t, filter, filter.Nil(true))

@@ -33,6 +33,11 @@ func TestInt64Filter_Like(t *testing.T) {
 	assert.Equal(t, filter, filter.Like(int64(12)))
 }
 
+func TestInt64Filter_ILike(t *testing.T) {
+	filter := yaormfilter.NewInt64Filter()
+	assert.Equal(t, filter, filter.ILike(int64(12)))
+}
+
 func TestInt64Filter_Nil(t *testing.T) {
 	filter := yaormfilter.NewInt64Filter()
 	assert.Equal(t, filter, filter.Nil(true))

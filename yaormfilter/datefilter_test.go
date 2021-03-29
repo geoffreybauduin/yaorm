@@ -34,6 +34,11 @@ func TestDateFilter_Like(t *testing.T) {
 	assert.Equal(t, filter, filter.Like(time.Now()))
 }
 
+func TestDateFilter_ILike(t *testing.T) {
+	filter := yaormfilter.NewDateFilter()
+	assert.Equal(t, filter, filter.ILike(time.Now()))
+}
+
 func TestDateFilter_Nil(t *testing.T) {
 	filter := yaormfilter.NewDateFilter()
 	assert.Equal(t, filter, filter.Nil(true))

@@ -42,6 +42,11 @@ func (f *Int64Filter) Like(v interface{}) ValueFilter {
 	return f
 }
 
+// ILike is not applicable on int64
+func (f *Int64Filter) ILike(v interface{}) ValueFilter {
+	return f
+}
+
 // Nil adds a nil filter
 func (f *Int64Filter) Nil(v bool) ValueFilter {
 	f.nil(v)
